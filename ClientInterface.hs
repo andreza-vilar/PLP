@@ -1,14 +1,22 @@
 module ClientInterface where
 
-viewMovies :: IO ()
-viewMovies = putStrLn "Visualizar horários e sessões disponíveis."
+import System.IO (readFile)
 
+-- Função para visualizar filmes
+viewMovies :: IO ()
+viewMovies = do
+  contents <- readFile "movies.txt"
+  putStrLn "Lista de filmes disponíveis:"
+  putStrLn contents
+
+-- Outras funções do cliente
 buyTicket :: IO ()
 buyTicket = putStrLn "Comprar um ingresso."
 
 giveFeedback :: IO ()
 giveFeedback = putStrLn "Deixar um feedback sobre o filme, sala ou comida."
 
+-- Menu do cliente
 runClientMode :: IO ()
 runClientMode = do
   putStrLn "1) Visualizar Filmes"
