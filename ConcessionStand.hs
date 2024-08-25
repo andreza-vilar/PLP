@@ -1,11 +1,15 @@
 module ConcessionStand where
 
-import System.IO (readFile, writeFile, appendFile)
+import System.IO (withFile, IOMode(..), hGetContents, hPutStrLn, hPutStr, hClose)
 import Data.List (isPrefixOf)
 
--- Arquivo onde os itens da bomboniere serão armazenados
+-- Arquivo onde os itens da bomboniere são armazenados
 fileName :: FilePath
 fileName = "concessionStand.txt"
+
+-- Código de acesso para o funcionário (você pode mudar para algo mais seguro)
+employeePassword :: String
+employeePassword = "1234"
 
 -- Função para adicionar um item à bomboniere
 addItem :: IO ()
@@ -15,15 +19,16 @@ addItem = do
   putStrLn "Digite o preço do item (em reais):"
   price <- getLine
   let itemEntry = itemName ++ " | R$ " ++ price ++ "\n"
-  appendFile fileName itemEntry
+  withFile fileName AppendMode (\handle -> hPutStrLn handle itemEntry)
   putStrLn "Item adicionado com sucesso."
 
 -- Função para listar todos os itens da bomboniere
 listItems :: IO ()
 listItems = do
-  contents <- readFile fileName
-  putStrLn "Itens da bomboniere:"
-  putStrLn contents
+  withFile fileName ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    putStrLn "Itens da bomboniere:"
+    putStrLn contents
 
 -- Função para editar um item na bomboniere
 editItem :: IO ()
@@ -50,16 +55,24 @@ updateItem oldName newName newPrice line
       in updatedName ++ " | R$ " ++ updatedPrice
   | otherwise = line
 
--- Função para remover um item da bomboniere
+-- Função para remover um item da bomboniere (somente funcionário)
 removeItem :: IO ()
 removeItem = do
-  listItems
-  putStrLn "Digite o nome do item a ser removido:"
-  itemToRemove <- getLine
-  contents <- readFile fileName
-  let updatedItems = filter (not . isPrefixOf itemToRemove) (lines contents)
-  writeFile fileName (unlines updatedItems)
-  putStrLn "Item removido com sucesso."
+  putStrLn "Digite o código de acesso do funcionário:"
+  enteredPassword <- getLine
+  if enteredPassword == employeePassword
+    then do
+      contents <- readFile fileName
+      putStrLn "Itens da bomboniere:"
+      putStrLn contents
+      putStrLn "Digite o nome do item a ser removido:"
+      itemToRemove <- getLine
+      let updatedItems = filter (not . isPrefixOf itemToRemove) (lines contents)
+      -- Força a avaliação do conteúdo antes de abrir o arquivo novamente
+      length updatedItems `seq` writeFile fileName (unlines updatedItems)
+      putStrLn "Item removido com sucesso."
+    else putStrLn "Código de acesso incorreto. Acesso negado."
+
 
 -- Menu de gerenciamento da bomboniere
 manageConcessionStand :: IO ()

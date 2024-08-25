@@ -1,31 +1,42 @@
 module ClientInterface where
 
-import System.IO (readFile)
-import Data.List (isPrefixOf)
+import System.IO (withFile, IOMode(..), hGetContents)
+import Data.List (isPrefixOf, find)
 
 -- Função para visualizar filmes
 viewMovies :: IO ()
 viewMovies = do
-  contents <- readFile "movies.txt"
-  putStrLn "Lista de filmes disponíveis:"
-  putStrLn contents
+  withFile "movies.txt" ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    putStrLn "Lista de filmes disponíveis:"
+    putStrLn contents
 
 -- Função para visualizar itens da bomboniere
-viewItems :: IO ()
+viewItems :: IO [String]
 viewItems = do
-  contents <- readFile "concessionStand.txt"
-  putStrLn "Itens da bomboniere disponíveis:"
-  putStrLn contents
+  withFile "concessionStand.txt" ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    let items = lines contents
+    putStrLn "Itens da bomboniere disponíveis:"
+    if null items
+      then putStrLn "Nenhum item disponível." >> return []
+      else do
+        mapM_ putStrLn items
+        return items
 
 -- Função para comprar um item da bomboniere
 buyItem :: IO ()
 buyItem = do
-  viewItems
-  putStrLn "Digite o nome do item que deseja comprar:"
-  itemName <- getLine
-  -- Simulação de confirmação de compra
-  putStrLn ("Você comprou o item: " ++ itemName)
-  -- Aqui você pode adicionar lógica para realmente processar a compra, se necessário
+  items <- viewItems
+  if null items
+    then putStrLn "Voltando ao menu principal..." -- Caso não haja itens, volta ao menu principal
+    else do
+      putStrLn "Digite o nome do item que deseja comprar:"
+      itemName <- getLine
+      -- Verifica se o item existe na lista de itens disponíveis
+      case find (isPrefixOf itemName) items of
+        Just _  -> putStrLn ("Você comprou o item: " ++ itemName)
+        Nothing -> putStrLn "Item não encontrado. Voltando ao menu principal."
 
 -- Outras funções do cliente
 buyTicket :: IO ()

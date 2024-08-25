@@ -1,1 +1,4 @@
-pipoca | R$ 6,59
+pipoca | R$ 5
+
+coca | R$ 10
+
