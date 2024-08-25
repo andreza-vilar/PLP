@@ -2,8 +2,9 @@ module ClientInterface where
 
 import System.IO (withFile, IOMode(..), hGetContents)
 import Data.List (isPrefixOf, find)
+import SessionManagement (Session(..)) -- Importa o tipo Session do módulo SessionManagement
 
--- Função para visualizar filmes
+-- Função para visualizar filmes (mantida)
 viewMovies :: IO ()
 viewMovies = do
   withFile "movies.txt" ReadMode $ \handle -> do
@@ -11,7 +12,7 @@ viewMovies = do
     putStrLn "Lista de filmes disponíveis:"
     putStrLn contents
 
--- Função para visualizar itens da bomboniere
+-- Função para visualizar itens da bomboniere (mantida)
 viewItems :: IO [String]
 viewItems = do
   withFile "concessionStand.txt" ReadMode $ \handle -> do
@@ -24,7 +25,7 @@ viewItems = do
         mapM_ putStrLn items
         return items
 
--- Função para comprar um item da bomboniere
+-- Função para comprar um item da bomboniere (mantida)
 buyItem :: IO ()
 buyItem = do
   items <- viewItems
@@ -38,27 +39,49 @@ buyItem = do
         Just _  -> putStrLn ("Você comprou o item: " ++ itemName)
         Nothing -> putStrLn "Item não encontrado. Voltando ao menu principal."
 
--- Outras funções do cliente
+-- Função para visualizar sessões de cinema
+viewSessions :: IO ()
+viewSessions = do
+  withFile "sessions.txt" ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    let sessions = read contents :: [Session]
+    putStrLn "Sessões disponíveis:"
+    if null sessions
+      then putStrLn "Nenhuma sessão disponível."
+      else mapM_ printSessionDetails sessions
+
+-- Função auxiliar para imprimir os detalhes de uma sessão
+printSessionDetails :: Session -> IO ()
+printSessionDetails (Session title time room date) = do
+  putStrLn $ "Filme: " ++ title
+  putStrLn $ "Data: " ++ date
+  putStrLn $ "Horário: " ++ time
+  putStrLn $ "Sala: " ++ room
+  putStrLn "------------------------"
+
+-- Outras funções do cliente (mantidas)
 buyTicket :: IO ()
 buyTicket = putStrLn "Comprar um ingresso."
 
 giveFeedback :: IO ()
 giveFeedback = putStrLn "Deixar um feedback sobre o filme, sala ou comida."
 
--- Menu do cliente
+-- Menu do cliente (atualizado)
 runClientMode :: IO ()
 runClientMode = do
   putStrLn "Modo Cliente:"
   putStrLn "1) Visualizar Filmes"
-  putStrLn "2) Comprar Ingresso"
-  putStrLn "3) Comprar Item da Bomboniere"
-  putStrLn "4) Deixar Feedback"
-  putStrLn "5) Voltar ao Menu Principal"
+  putStrLn "2) Visualizar Sessões Disponíveis"  -- Adicionada nova opção para visualizar sessões
+  putStrLn "3) Comprar Ingresso"
+  putStrLn "4) Comprar Item da Bomboniere"
+  putStrLn "5) Deixar Feedback"
+  putStrLn "6) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> viewMovies >> runClientMode
-    "2" -> buyTicket >> runClientMode
-    "3" -> buyItem >> runClientMode
-    "4" -> giveFeedback >> runClientMode
-    "5" -> return () -- Retorna ao menu principal
+    "2" -> viewSessions >> runClientMode -- Chama a nova função de visualizar sessões
+    "3" -> buyTicket >> runClientMode
+    "4" -> buyItem >> runClientMode
+    "5" -> giveFeedback >> runClientMode
+    "6" -> return () -- Retorna ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode

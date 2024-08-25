@@ -1,33 +1,144 @@
 module SessionManagement where
 
+import Data.IORef
+import Control.Monad (when)
+import System.IO
+import Data.Time (getCurrentTime, utctDay)
+
+-- Definição dos tipos de usuário e sessão
 data UserType = Employee | Customer deriving (Eq, Show)
+data Session = Session { movieTitle :: String, time :: String, room :: String, date :: String } deriving (Show, Read)
 
 -- Função para verificar se o usuário é funcionário
 isEmployee :: UserType -> Bool
 isEmployee Employee = True
 isEmployee _        = False
 
--- Função para editar uma sessão de cinema
-editSession :: UserType -> IO ()
-editSession user = 
+-- Função para salvar sessões em um arquivo
+saveSessionsToFile :: [Session] -> IO ()
+saveSessionsToFile sessions = do
+    handle <- openFile "sessions.txt" WriteMode
+    hPutStrLn handle (show sessions)
+    hClose handle
+
+-- Função para carregar sessões de um arquivo
+loadSessionsFromFile :: IO [Session]
+loadSessionsFromFile = do
+    contents <- readFile "sessions.txt"
+    return (read contents :: [Session])
+
+-- Função para criar uma nova sessão de cinema
+addSession :: UserType -> IORef [Session] -> IO ()
+addSession user sessionsRef = 
     if isEmployee user
     then do
-        putStrLn "Editar sessão: Informe os novos detalhes."
-        -- Aqui você poderia adicionar o código para editar a sessão,
-        -- como atualizar o banco de dados ou a estrutura de dados.
-        putStrLn "Sessão editada com sucesso para funcionários e clientes."
+        putStrLn "Adicionar nova sessão: Informe o título do filme."
+        title <- getLine
+        putStrLn "Informe o horário da sessão (por exemplo, 15:00)."
+        sessionTime <- getLine
+        putStrLn "Informe a sala (por exemplo, Sala 3)."
+        sessionRoom <- getLine
+        putStrLn "Informe a data de exibição do filme (por exemplo, 2024-08-25)."
+        sessionDate <- getLine
+
+        -- Adicionar a nova sessão na lista de sessões
+        let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate }
+        modifyIORef sessionsRef (\sessions -> newSession : sessions)
+        
+        -- Salvar a nova lista de sessões no arquivo
+        sessions <- readIORef sessionsRef
+        saveSessionsToFile sessions
+
+        putStrLn "Sessão adicionada com sucesso."
+    else
+        putStrLn "Apenas funcionários podem adicionar sessões."
+
+-- Função para editar uma sessão de cinema
+editSession :: UserType -> IORef [Session] -> IO ()
+editSession user sessionsRef = 
+    if isEmployee user
+    then do
+        putStrLn "Editar sessão: Informe o título do filme da sessão que deseja editar."
+        title <- getLine
+        putStrLn "Informe o novo horário da sessão (por exemplo, 17:00)."
+        newTime <- getLine
+        putStrLn "Informe a nova sala (por exemplo, Sala 4)."
+        newRoom <- getLine
+        putStrLn "Informe a nova data de exibição do filme (por exemplo, 2024-08-25)."
+        newDate <- getLine
+
+        -- Atualizar a sessão na lista
+        modifyIORef sessionsRef (map (\s -> if movieTitle s == title 
+                                            then s { time = newTime, room = newRoom, date = newDate }
+                                            else s))
+        
+        -- Salvar as sessões atualizadas no arquivo
+        sessions <- readIORef sessionsRef
+        saveSessionsToFile sessions
+
+        putStrLn "Sessão editada com sucesso."
     else
         putStrLn "Apenas funcionários podem editar sessões."
 
--- Exemplo de uso da função principal de gerenciamento de sessões
-manageSessions :: UserType -> IO ()
-manageSessions user = do
+-- Função para remover uma sessão de cinema
+removeSession :: UserType -> IORef [Session] -> IO ()
+removeSession user sessionsRef = 
+    if isEmployee user
+    then do
+        putStrLn "Remover sessão: Informe o título do filme da sessão que deseja remover."
+        title <- getLine
+
+        -- Remover a sessão da lista
+        modifyIORef sessionsRef (filter (\s -> movieTitle s /= title))
+        
+        -- Salvar as sessões atualizadas no arquivo
+        sessions <- readIORef sessionsRef
+        saveSessionsToFile sessions
+
+        putStrLn "Sessão removida com sucesso."
+    else
+        putStrLn "Apenas funcionários podem remover sessões."
+
+-- Função para exibir todas as sessões para usuários-clientes
+viewSessions :: IORef [Session] -> IO ()
+viewSessions sessionsRef = do
+    sessions <- readIORef sessionsRef
+    if null sessions
+    then putStrLn "Nenhuma sessão disponível."
+    else mapM_ printSessionDetails sessions
+
+-- Função auxiliar para imprimir os detalhes de uma sessão
+printSessionDetails :: Session -> IO ()
+printSessionDetails (Session title time room date) = do
+    putStrLn $ "Filme: " ++ title
+    putStrLn $ "Horário: " ++ time
+    putStrLn $ "Sala: " ++ room
+    putStrLn $ "Data: " ++ date
+    putStrLn "------------------------"
+
+-- Função principal de gerenciamento de sessões
+manageSessions :: UserType -> IORef [Session] -> IO ()
+manageSessions user sessionsRef = do
     putStrLn "1) Criar Sessão"
     putStrLn "2) Editar Sessão"
     putStrLn "3) Remover Sessão"
+    putStrLn "4) Visualizar Sessões"
+    putStrLn "5) Voltar ao Menu Principal"
     option <- getLine
     case option of
-        "1" -> putStrLn "Criar uma nova sessão de cinema."
-        "2" -> editSession user
-        "3" -> putStrLn "Remover uma sessão."
-        _   -> putStrLn "Opção inválida. Tente novamente."
+        "1" -> addSession user sessionsRef >> manageSessions user sessionsRef
+        "2" -> editSession user sessionsRef >> manageSessions user sessionsRef
+        "3" -> removeSession user sessionsRef >> manageSessions user sessionsRef
+        "4" -> viewSessions sessionsRef >> manageSessions user sessionsRef
+        "5" -> putStrLn "Voltando ao menu principal..."
+        _   -> putStrLn "Opção inválida. Tente novamente." >> manageSessions user sessionsRef
+
+-- Renomeando a função main para evitar conflitos
+sessionManagementMain :: IO ()
+sessionManagementMain = do
+    sessions <- loadSessionsFromFile
+    sessionsRef <- newIORef sessions
+    putStrLn "Informe o tipo de usuário (Employee ou Customer):"
+    userTypeInput <- getLine
+    let userType = if userTypeInput == "Employee" then Employee else Customer
+    manageSessions userType sessionsRef

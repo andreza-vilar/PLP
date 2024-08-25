@@ -6,6 +6,7 @@ import UserManagement
 import ReportGeneration
 import ConcessionStand
 import ClientInterface (runClientMode) -- Importa a função runClientMode do módulo ClientInterface
+import Data.IORef (newIORef, IORef)
 
 -- Função para validar a senha do funcionário
 validateEmployeePassword :: IO Bool
@@ -18,13 +19,15 @@ runEmployeeMode :: IO ()
 runEmployeeMode = do
   valid <- validateEmployeePassword
   if valid
-    then employeeMenu
+    then do
+      sessionsRef <- newIORef []  -- Cria uma referência à lista de sessões
+      employeeMenu sessionsRef
     else do
       putStrLn "Senha incorreta. Retornando ao menu principal."
       main -- Retorna ao menu principal
 
-employeeMenu :: IO ()
-employeeMenu = do
+employeeMenu :: IORef [Session] -> IO ()
+employeeMenu sessionsRef = do
   putStrLn "Modo Funcionário:"
   putStrLn "1) Gerenciamento de Filmes"
   putStrLn "2) Gerenciamento de Sessões"
@@ -34,13 +37,13 @@ employeeMenu = do
   putStrLn "6) Voltar ao Menu Principal"
   option <- getLine
   case option of
-    "1" -> manageMovies >> employeeMenu
-    "2" -> manageSessions Employee >> employeeMenu  -- Passa 'Employee' como argumento
-    "3" -> manageUsers >> employeeMenu
-    "4" -> generateReports >> employeeMenu
-    "5" -> manageConcessionStand >> employeeMenu
+    "1" -> manageMovies >> employeeMenu sessionsRef
+    "2" -> manageSessions Employee sessionsRef >> employeeMenu sessionsRef  -- Passa 'sessionsRef' como argumento
+    "3" -> manageUsers >> employeeMenu sessionsRef
+    "4" -> generateReports >> employeeMenu sessionsRef
+    "5" -> manageConcessionStand >> employeeMenu sessionsRef
     "6" -> main -- Volta ao menu principal
-    _   -> putStrLn "Opção inválida. Tente novamente." >> employeeMenu
+    _   -> putStrLn "Opção inválida. Tente novamente." >> employeeMenu sessionsRef
 
 
 main :: IO ()
