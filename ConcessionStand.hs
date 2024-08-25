@@ -23,27 +23,37 @@ addItem = do
   putStrLn "Item adicionado com sucesso."
 
 -- Função para listar todos os itens da bomboniere
-listItems :: IO ()
+listItems :: IO [String]
 listItems = do
   withFile fileName ReadMode $ \handle -> do
     contents <- hGetContents handle
-    putStrLn "Itens da bomboniere:"
-    putStrLn contents
+    let items = lines contents
+    if null items
+      then do
+        putStrLn "Nenhum item disponível na bomboniere."
+        return []
+      else do
+        putStrLn "Itens da bomboniere:"
+        mapM_ putStrLn items
+        return items
 
 -- Função para editar um item na bomboniere
 editItem :: IO ()
 editItem = do
-  listItems
-  putStrLn "Digite o nome do item a ser editado:"
-  oldName <- getLine
-  putStrLn "Digite o novo nome do item (ou deixe em branco para manter o mesmo):"
-  newName <- getLine
-  putStrLn "Digite o novo preço do item (ou deixe em branco para manter o mesmo):"
-  newPrice <- getLine
-  contents <- readFile fileName
-  let updatedItems = map (updateItem oldName newName newPrice) (lines contents)
-  writeFile fileName (unlines updatedItems)
-  putStrLn "Item atualizado com sucesso."
+  items <- listItems
+  if null items
+    then return () -- Volta ao menu principal se não houver itens
+    else do
+      putStrLn "Digite o nome do item a ser editado:"
+      oldName <- getLine
+      putStrLn "Digite o novo nome do item (ou deixe em branco para manter o mesmo):"
+      newName <- getLine
+      putStrLn "Digite o novo preço do item (ou deixe em branco para manter o mesmo):"
+      newPrice <- getLine
+      contents <- readFile fileName
+      let updatedItems = map (updateItem oldName newName newPrice) (lines contents)
+      writeFile fileName (unlines updatedItems)
+      putStrLn "Item atualizado com sucesso."
 
 -- Função auxiliar para atualizar um item
 updateItem :: String -> String -> String -> String -> String
@@ -73,6 +83,19 @@ removeItem = do
       putStrLn "Item removido com sucesso."
     else putStrLn "Código de acesso incorreto. Acesso negado."
 
+-- Função para comprar itens da bomboniere
+buyItems :: IO ()
+buyItems = do
+  items <- listItems
+  if null items
+    then return () -- Volta ao menu principal se não houver itens
+    else do
+      putStrLn "Digite o nome do item que deseja comprar (ou 'voltar' para retornar ao menu principal):"
+      itemToBuy <- getLine
+      if itemToBuy == "voltar"
+        then return () -- Volta ao menu principal
+        else putStrLn $ "Você comprou: " ++ itemToBuy
+        -- Aqui você pode adicionar funcionalidades para processar a compra, se necessário
 
 -- Menu de gerenciamento da bomboniere
 manageConcessionStand :: IO ()
@@ -81,12 +104,14 @@ manageConcessionStand = do
   putStrLn "2) Listar Itens"
   putStrLn "3) Editar Item"
   putStrLn "4) Remover Item"
-  putStrLn "5) Voltar ao Menu Principal"
+  putStrLn "5) Comprar Itens"
+  putStrLn "6) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> addItem >> manageConcessionStand
     "2" -> listItems >> manageConcessionStand
     "3" -> editItem >> manageConcessionStand
     "4" -> removeItem >> manageConcessionStand
-    "5" -> return () -- Volta ao menu principal
+    "5" -> buyItems >> manageConcessionStand
+    "6" -> return () -- Volta ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> manageConcessionStand
