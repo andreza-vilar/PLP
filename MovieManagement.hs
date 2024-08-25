@@ -1,7 +1,7 @@
 module MovieManagement where
 
 import System.IO (appendFile, readFile, writeFile)
-import Data.List (isInfixOf, isPrefixOf, intercalate, delete)
+import Data.List (isPrefixOf, isInfixOf, intercalate, delete)
 
 -- Função para adicionar um filme
 addMovie :: IO ()
@@ -32,29 +32,8 @@ removeMovie = do
   putStrLn "Digite o título do filme a ser removido:"
   titleToRemove <- getLine
   let updatedMovies = filter (not . isTitle titleToRemove) movies
-  contents <- readFile "movies.txt"
-  let updatedContents = unlines (filter (\line -> not (isTitle titleToRemove line)) (lines contents))
-  writeFile "movies.txt" updatedContents
+  writeFile "movies.txt" (unlines updatedMovies)
   putStrLn "Filme removido com sucesso."
-  removeMovieFromViews titleToRemove
-
--- Função para remover o filme das visualizações de usuários e funcionários
-removeMovieFromViews :: String -> IO ()
-removeMovieFromViews titleToRemove = do
-  contents <- readFile "movies.txt"
-  let updatedContents = unlines $ map (removeTitle titleToRemove) (lines contents)
-  writeFile "movies.txt" updatedContents
-
--- Função auxiliar para remover o título da lista de visualização de um usuário ou funcionário
-removeTitle :: String -> String -> String
-removeTitle titleToRemove line
-  | "User:" `isPrefixOf` line || "Employee:" `isPrefixOf` line =
-      let (prefix, titles) = break (== ':') line
-          updatedTitles = filter (/= titleToRemove) (splitTitles $ drop 1 titles)
-      in prefix ++ ": " ++ intercalate ", " updatedTitles
-  | otherwise = line
-  where
-    splitTitles = words . map (\c -> if c == ',' then ' ' else c) -- Converte a lista de títulos em palavras
 
 -- Função auxiliar para verificar se a linha contém o título do filme
 isTitle :: String -> String -> Bool
@@ -71,10 +50,12 @@ manageMovies = do
   putStrLn "2) Editar Filme"
   putStrLn "3) Remover Filme"
   putStrLn "4) Listar Filmes"
+  putStrLn "5) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> addMovie
     "2" -> editMovie
     "3" -> removeMovie
     "4" -> listMovies >> return ()
-    _   -> putStrLn "Opção inválida. Tente novamente."
+    "5" -> return () -- Volta ao menu principal
+    _   -> putStrLn "Opção inválida. Tente novamente." >> manageMovies
