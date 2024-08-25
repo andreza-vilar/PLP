@@ -35,12 +35,13 @@ employeeMenu = do
   option <- getLine
   case option of
     "1" -> manageMovies >> employeeMenu
-    "2" -> manageSessions >> employeeMenu
+    "2" -> manageSessions Employee >> employeeMenu  -- Passa 'Employee' como argumento
     "3" -> manageUsers >> employeeMenu
     "4" -> generateReports >> employeeMenu
     "5" -> manageConcessionStand >> employeeMenu
     "6" -> main -- Volta ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> employeeMenu
+
 
 main :: IO ()
 main = do

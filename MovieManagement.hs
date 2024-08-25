@@ -25,37 +25,51 @@ listMovies = do
   mapM_ putStrLn movies
   return movies
 
+-- Função para editar um filme existente
+editMovie :: IO ()
+editMovie = do
+  movies <- listMovies
+  putStrLn "Digite o título do filme a ser editado:"
+  titleToEdit <- getLine
+  let movieToEdit = filter (isInfixOf titleToEdit) movies
+  if null movieToEdit
+    then putStrLn "Filme não encontrado."
+    else do
+      putStrLn "Digite o novo título do filme:"
+      newTitle <- getLine
+      putStrLn "Digite o novo diretor do filme:"
+      newDirector <- getLine
+      putStrLn "Digite o novo ano de lançamento:"
+      newYear <- getLine
+      let newMovieEntry = "Movie: " ++ newTitle ++ " | " ++ newDirector ++ " | " ++ newYear
+      let updatedMovies = map (\movie -> if isInfixOf titleToEdit movie then newMovieEntry else movie) movies
+      writeFile "movies.txt" (unlines updatedMovies)
+      putStrLn "Filme editado com sucesso."
+
 -- Função para remover um filme
 removeMovie :: IO ()
 removeMovie = do
   movies <- listMovies
   putStrLn "Digite o título do filme a ser removido:"
   titleToRemove <- getLine
-  let updatedMovies = filter (not . isTitle titleToRemove) movies
+  let updatedMovies = filter (not . isInfixOf titleToRemove) movies
   writeFile "movies.txt" (unlines updatedMovies)
   putStrLn "Filme removido com sucesso."
 
--- Função auxiliar para verificar se a linha contém o título do filme
-isTitle :: String -> String -> Bool
-isTitle title line = title `isInfixOf` line && "Movie: " `isPrefixOf` line
-
--- Funções para editar filme (mantidas como estão)
-editMovie :: IO ()
-editMovie = putStrLn "Editar informações de um filme existente."
-
--- Menu de gerenciamento de filmes
+-- Função para gerenciar filmes
 manageMovies :: IO ()
 manageMovies = do
+  putStrLn "Gerenciamento de Filmes:"
   putStrLn "1) Adicionar Filme"
   putStrLn "2) Editar Filme"
-  putStrLn "3) Remover Filme"
-  putStrLn "4) Listar Filmes"
-  putStrLn "5) Voltar ao Menu Principal"
+  putStrLn "3) Listar Filmes"
+  putStrLn "4) Remover Filme"
+  putStrLn "5) Voltar"
   option <- getLine
   case option of
-    "1" -> addMovie
-    "2" -> editMovie
-    "3" -> removeMovie
-    "4" -> listMovies >> return ()
-    "5" -> return () -- Volta ao menu principal
+    "1" -> addMovie >> manageMovies
+    "2" -> editMovie >> manageMovies
+    "3" -> listMovies >> manageMovies
+    "4" -> removeMovie >> manageMovies
+    "5" -> putStrLn "Voltando ao menu anterior."
     _   -> putStrLn "Opção inválida. Tente novamente." >> manageMovies

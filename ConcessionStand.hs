@@ -19,7 +19,7 @@ addItem = do
   putStrLn "Digite o preço do item (em reais):"
   price <- getLine
   let itemEntry = itemName ++ " | R$ " ++ price ++ "\n"
-  withFile fileName AppendMode (\handle -> hPutStrLn handle itemEntry)
+  appendFile fileName (itemEntry ++ "\n")
   putStrLn "Item adicionado com sucesso."
 
 -- Função para listar todos os itens da bomboniere
@@ -104,14 +104,12 @@ manageConcessionStand = do
   putStrLn "2) Listar Itens"
   putStrLn "3) Editar Item"
   putStrLn "4) Remover Item"
-  putStrLn "5) Comprar Itens"
-  putStrLn "6) Voltar ao Menu Principal"
+  putStrLn "5) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> addItem >> manageConcessionStand
     "2" -> listItems >> manageConcessionStand
     "3" -> editItem >> manageConcessionStand
     "4" -> removeItem >> manageConcessionStand
-    "5" -> buyItems >> manageConcessionStand
-    "6" -> return () -- Volta ao menu principal
+    "5" -> return () -- Volta ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> manageConcessionStand
