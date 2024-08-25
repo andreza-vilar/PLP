@@ -14,15 +14,16 @@ addMovie = do
   year <- getLine
   let movieEntry = "Movie: " ++ title ++ " | " ++ director ++ " | " ++ year ++ "\n"
   appendFile "movies.txt" movieEntry
-  putStrLn "Filme adicionado com sucesso."
+  putStrLn "Filme adicionado com sucesso.\n"
 
 -- Função para listar todos os filmes
 listMovies :: IO [String]
 listMovies = do
   contents <- readFile "movies.txt"
   let movies = filter (isPrefixOf "Movie: ") (lines contents)
-  putStrLn "Lista de filmes disponíveis:"
+  putStrLn "Lista de filmes disponíveis:\n"
   mapM_ putStrLn movies
+  putStrLn "\n"
   return movies
 
 -- Função para editar um filme existente
@@ -33,7 +34,7 @@ editMovie = do
   titleToEdit <- getLine
   let movieToEdit = filter (isInfixOf titleToEdit) movies
   if null movieToEdit
-    then putStrLn "Filme não encontrado."
+    then putStrLn "Filme não encontrado.\n"
     else do
       putStrLn "Digite o novo título do filme:"
       newTitle <- getLine
@@ -44,7 +45,7 @@ editMovie = do
       let newMovieEntry = "Movie: " ++ newTitle ++ " | " ++ newDirector ++ " | " ++ newYear
       let updatedMovies = map (\movie -> if isInfixOf titleToEdit movie then newMovieEntry else movie) movies
       writeFile "movies.txt" (unlines updatedMovies)
-      putStrLn "Filme editado com sucesso."
+      putStrLn "Filme editado com sucesso.\n"
 
 -- Função para remover um filme
 removeMovie :: IO ()
@@ -54,7 +55,7 @@ removeMovie = do
   titleToRemove <- getLine
   let updatedMovies = filter (not . isInfixOf titleToRemove) movies
   writeFile "movies.txt" (unlines updatedMovies)
-  putStrLn "Filme removido com sucesso."
+  putStrLn "Filme removido com sucesso.\n"
 
 -- Função para gerenciar filmes
 manageMovies :: IO ()
@@ -64,7 +65,7 @@ manageMovies = do
   putStrLn "2) Editar Filme"
   putStrLn "3) Listar Filmes"
   putStrLn "4) Remover Filme"
-  putStrLn "5) Voltar"
+  putStrLn "5) Voltar\n"
   option <- getLine
   case option of
     "1" -> addMovie >> manageMovies
@@ -72,4 +73,4 @@ manageMovies = do
     "3" -> listMovies >> manageMovies
     "4" -> removeMovie >> manageMovies
     "5" -> putStrLn "Voltando ao menu anterior."
-    _   -> putStrLn "Opção inválida. Tente novamente." >> manageMovies
+    _   -> putStrLn "Opção inválida. Tente novamente.\n" >> manageMovies
