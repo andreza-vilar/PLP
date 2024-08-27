@@ -83,6 +83,12 @@ buyTicket = do
         putStrLn $ "Horário: " ++ time
         putStrLn $ "Sala: " ++ room
         putStrLn $ "Preço do Ingresso: R$ " ++ show price
+        
+        putStrLn "Você é estudante e tem carteirinha? (s/n):"
+        isStudent <- getLine
+        let finalPrice = if isStudent == "s" then price * 0.5 else price
+        putStrLn $ "Preço final do Ingresso: R$ " ++ show finalPrice
+
         putStrLn "Digite 's' para confirmar a compra ou qualquer outra tecla para cancelar:"
         confirmation <- getLine
         if confirmation == "s"

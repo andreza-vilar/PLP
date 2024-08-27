@@ -1,1 +1,1 @@
-[Session {movieTitle = "mamamia", time = "15:30", room = "7", date = "02/09", ticketPrice = 12.99}]
+[Session {movieTitle = "mamamia", time = "16:30", room = "2", date = "27/08", ticketPrice = 20.0}]
