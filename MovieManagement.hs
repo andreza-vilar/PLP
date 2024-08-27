@@ -12,7 +12,11 @@ addMovie = do
   director <- getLine
   putStrLn "Digite o ano de lançamento:"
   year <- getLine
-  let movieEntry = "Movie: " ++ title ++ " | " ++ director ++ " | " ++ year ++ "\n"
+  putStrLn "Digite a classificação indicativa:"
+  rating <- getLine
+  putStrLn "Digite a duração do filme (em minutos):"
+  duration <- getLine
+  let movieEntry = "Movie: " ++ title ++ " | " ++ director ++ " | " ++ year ++ " | " ++ rating ++ " | " ++ duration ++ " min\n"
   appendFile "movies.txt" movieEntry
   putStrLn "Filme adicionado com sucesso."
 
@@ -41,9 +45,13 @@ editMovie = do
       newDirector <- getLine
       putStrLn "Digite o novo ano de lançamento:"
       newYear <- getLine
-      let newMovieEntry = "Movie: " ++ newTitle ++ " | " ++ newDirector ++ " | " ++ newYear
+      putStrLn "Digite a nova classificação indicativa:"
+      newRating <- getLine
+      putStrLn "Digite a nova duração do filme (em minutos):"
+      newDuration <- getLine
+      let newMovieEntry = "Movie: " ++ newTitle ++ " | " ++ newDirector ++ " | " ++ newYear ++ " | " ++ newRating ++ " | " ++ newDuration ++ " min"
       let updatedMovies = map (\movie -> if isInfixOf titleToEdit movie then newMovieEntry else movie) movies
-      writeFile "movies.txt" (unlines updatedMovies)
+      writeFile "movies.txt" (unlines(updatedMovies))
       putStrLn "Filme editado com sucesso."
 
 -- Função para remover um filme
@@ -53,7 +61,7 @@ removeMovie = do
   putStrLn "Digite o título do filme a ser removido:"
   titleToRemove <- getLine
   let updatedMovies = filter (not . isInfixOf titleToRemove) movies
-  writeFile "movies.txt" (unlines updatedMovies)
+  writeFile "movies.txt" (unlines(updatedMovies))
   putStrLn "Filme removido com sucesso."
 
 -- Função para gerenciar filmes
