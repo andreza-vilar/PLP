@@ -3,6 +3,7 @@ module ClientInterface where
 import System.IO (withFile, IOMode(..), hGetContents)
 import Data.List (isPrefixOf, find)
 import SessionManagement (Session(..)) -- Importa o tipo Session do módulo SessionManagement
+import CinemaInfo (viewCinemaInfo)     -- Importa a função viewCinemaInfo do módulo CinemaInfo
 
 -- Função para visualizar filmes (mantida)
 viewMovies :: IO ()
@@ -60,6 +61,7 @@ printSessionDetails (Session title time room date price) = do
   putStrLn $ "Preço do Ingresso: R$ " ++ show price
   putStrLn "------------------------"
 
+-- Função para comprar um ingresso (atualizada)
 buyTicket :: IO ()
 buyTicket = do
   putStrLn "Digite o título do filme para o qual deseja comprar o ingresso:"
@@ -113,17 +115,19 @@ runClientMode :: IO ()
 runClientMode = do
   putStrLn "Modo Cliente:"
   putStrLn "1) Visualizar Filmes"
-  putStrLn "2) Visualizar Sessões Disponíveis"  -- Adicionada nova opção para visualizar sessões
+  putStrLn "2) Visualizar Sessões Disponíveis"
   putStrLn "3) Comprar Ingresso"
   putStrLn "4) Comprar Item da Bomboniere"
-  putStrLn "5) Deixar Feedback"
-  putStrLn "6) Voltar ao Menu Principal"
+  putStrLn "5) Visualizar Informações do Cinema" -- Nova opção para visualizar as informações do cinema
+  putStrLn "6) Deixar Feedback"
+  putStrLn "7) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> viewMovies >> runClientMode
-    "2" -> viewSessions >> runClientMode -- Chama a nova função de visualizar sessões
+    "2" -> viewSessions >> runClientMode
     "3" -> buyTicket >> runClientMode
     "4" -> buyItem >> runClientMode
-    "5" -> giveFeedback >> runClientMode
-    "6" -> return () -- Retorna ao menu principal
+    "5" -> viewCinemaInfo >> runClientMode -- Chama a função para exibir informações do cinema
+    "6" -> giveFeedback >> runClientMode
+    "7" -> return () -- Retorna ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
