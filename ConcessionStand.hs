@@ -9,7 +9,7 @@ fileName = "concessionStand.txt"
 
 -- Código de acesso para o funcionário (você pode mudar para algo mais seguro)
 employeePassword :: String
-employeePassword = "1234"
+employeePassword = "admin"
 
 -- Função para adicionar um item à bomboniere
 addItem :: IO ()

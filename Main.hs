@@ -13,7 +13,7 @@ validateEmployeePassword :: IO Bool
 validateEmployeePassword = do
   putStrLn "Digite a senha de acesso para o modo Funcionário:"
   password <- getLine
-  return (password == "1234")
+  return (password == "admin")
 
 runEmployeeMode :: IO ()
 runEmployeeMode = do

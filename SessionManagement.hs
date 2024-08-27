@@ -14,49 +14,50 @@ isEmployee :: UserType -> Bool
 isEmployee Employee = True
 isEmployee _        = False
 
--- Função para salvar sessões em um arquivo
+-- Função para salvar sessões em um arquivo (sobrescrevendo o arquivo)
 saveSessionsToFile :: [Session] -> IO ()
 saveSessionsToFile sessions = do
-    handle <- openFile "sessions.txt" WriteMode
-    hPutStrLn handle (show sessions)
-    hClose handle
+    withFile "sessions.txt" WriteMode $ \handle -> do
+        hPutStrLn handle (show sessions)
+
 
 -- Função para carregar sessões de um arquivo
 loadSessionsFromFile :: IO [Session]
 loadSessionsFromFile = do
     contents <- readFile "sessions.txt"
-    return (read contents :: [Session])
+    return (if null contents then [] else read contents)
 
 -- Função para criar uma nova sessão de cinema
 addSession :: UserType -> IORef [Session] -> IO ()
 addSession user sessionsRef = 
-    if isEmployee user
-    then do
-        putStrLn "Adicionar nova sessão: Informe o título do filme."
-        title <- getLine
-        putStrLn "Informe o horário da sessão (por exemplo, 15:00)."
-        sessionTime <- getLine
-        putStrLn "Informe a sala (por exemplo, Sala 3)."
-        sessionRoom <- getLine
-        putStrLn "Informe a data de exibição do filme (por exemplo, 2024-08-25)."
-        sessionDate <- getLine
+    when (isEmployee user) $ do
+        addMultipleSessions sessionsRef
+        putStrLn "Sessões adicionadas com sucesso."
 
-        -- Adicionar a nova sessão na lista de sessões
-        let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate }
-        modifyIORef sessionsRef (\sessions -> newSession : sessions)
-        
-        -- Salvar a nova lista de sessões no arquivo
-        sessions <- readIORef sessionsRef
-        saveSessionsToFile sessions
+-- Função auxiliar para adicionar múltiplas sessões
+addMultipleSessions :: IORef [Session] -> IO ()
+addMultipleSessions sessionsRef = do
+    putStrLn "Adicionar nova sessão: Informe o título do filme."
+    title <- getLine
+    putStrLn "Informe o horário da sessão (por exemplo, 15:00)."
+    sessionTime <- getLine
+    putStrLn "Informe a sala (por exemplo, Sala 3)."
+    sessionRoom <- getLine
+    putStrLn "Informe a data de exibição do filme no formato DD/MM (por exemplo, 25/08)."
+    sessionDate <- getLine
 
-        putStrLn "Sessão adicionada com sucesso."
-    else
-        putStrLn "Apenas funcionários podem adicionar sessões."
+    let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate }
+    modifyIORef sessionsRef (\sessions -> newSession : sessions)
+
+    -- Atualiza o arquivo sessions.txt com a nova sessão
+    updatedSessions <- readIORef sessionsRef
+    saveSessionsToFile updatedSessions
+
 
 -- Função para editar uma sessão de cinema
 editSession :: UserType -> IORef [Session] -> IO ()
 editSession user sessionsRef = 
-    if isEmployee user
+    if isEmployee(user)
     then do
         putStrLn "Editar sessão: Informe o título do filme da sessão que deseja editar."
         title <- getLine
