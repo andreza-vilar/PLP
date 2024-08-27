@@ -60,10 +60,45 @@ printSessionDetails (Session title time room date price) = do
   putStrLn $ "Preço do Ingresso: R$ " ++ show price
   putStrLn "------------------------"
 
--- Outras funções do cliente (mantidas)
 buyTicket :: IO ()
-buyTicket = putStrLn "Comprar um ingresso."
+buyTicket = do
+  putStrLn "Digite o título do filme para o qual deseja comprar o ingresso:"
+  movieTitle <- getLine
+  putStrLn "Digite a data da sessão (DD/MM):"
+  sessionDate <- getLine
+  putStrLn "Digite o horário da sessão (HH:MM):"
+  sessionTime <- getLine
+  
+  withFile "sessions.txt" ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    let sessions = read contents :: [Session]
+        foundSession = find (\(Session title time _ date _) -> 
+                              title == movieTitle && date == sessionDate && time == sessionTime) sessions
 
+    case foundSession of
+      Just (Session title time room date price) -> do
+        putStrLn $ "Sessão encontrada!"
+        putStrLn $ "Filme: " ++ title
+        putStrLn $ "Data: " ++ date
+        putStrLn $ "Horário: " ++ time
+        putStrLn $ "Sala: " ++ room
+        putStrLn $ "Preço do Ingresso: R$ " ++ show price
+        putStrLn "Digite 's' para confirmar a compra ou qualquer outra tecla para cancelar:"
+        confirmation <- getLine
+        if confirmation == "s"
+          then putStrLn "Ingresso comprado com sucesso!"
+          else putStrLn "Compra cancelada."
+      Nothing -> do
+        putStrLn "Sessão não encontrada."
+        putStrLn "1) Tentar novamente"
+        putStrLn "2) Voltar ao menu anterior"
+        option <- getLine
+        case option of
+          "1" -> buyTicket
+          "2" -> return () -- Volta ao menu anterior
+          _   -> putStrLn "Opção inválida. Voltando ao menu anterior."
+
+-- Função para deixar feedback (mantida)
 giveFeedback :: IO ()
 giveFeedback = putStrLn "Deixar um feedback sobre o filme, sala ou comida."
 
