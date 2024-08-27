@@ -7,7 +7,7 @@ import Data.Time (getCurrentTime, utctDay)
 
 -- Definição dos tipos de usuário e sessão
 data UserType = Employee | Customer deriving (Eq, Show)
-data Session = Session { movieTitle :: String, time :: String, room :: String, date :: String } deriving (Show, Read)
+data Session = Session { movieTitle :: String, time :: String, room :: String, date :: String, ticketPrice :: Double } deriving (Show, Read)
 
 -- Função para verificar se o usuário é funcionário
 isEmployee :: UserType -> Bool
@@ -19,7 +19,6 @@ saveSessionsToFile :: [Session] -> IO ()
 saveSessionsToFile sessions = do
     withFile "sessions.txt" WriteMode $ \handle -> do
         hPutStrLn handle (show sessions)
-
 
 -- Função para carregar sessões de um arquivo
 loadSessionsFromFile :: IO [Session]
@@ -45,14 +44,15 @@ addMultipleSessions sessionsRef = do
     sessionRoom <- getLine
     putStrLn "Informe a data de exibição do filme no formato DD/MM (por exemplo, 25/08)."
     sessionDate <- getLine
+    putStrLn "Informe o preço do ingresso (por exemplo, 20.50)."
+    price <- readLn :: IO Double
 
-    let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate }
+    let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate, ticketPrice = price }
     modifyIORef sessionsRef (\sessions -> newSession : sessions)
 
     -- Atualiza o arquivo sessions.txt com a nova sessão
     updatedSessions <- readIORef sessionsRef
     saveSessionsToFile updatedSessions
-
 
 -- Função para editar uma sessão de cinema
 editSession :: UserType -> IORef [Session] -> IO ()
@@ -67,10 +67,12 @@ editSession user sessionsRef =
         newRoom <- getLine
         putStrLn "Informe a nova data de exibição do filme (por exemplo, 2024-08-25)."
         newDate <- getLine
+        putStrLn "Informe o novo preço do ingresso (por exemplo, 25.00)."
+        newPrice <- readLn :: IO Double
 
         -- Atualizar a sessão na lista
         modifyIORef sessionsRef (map (\s -> if movieTitle s == title 
-                                            then s { time = newTime, room = newRoom, date = newDate }
+                                            then s { time = newTime, room = newRoom, date = newDate, ticketPrice = newPrice }
                                             else s))
         
         -- Salvar as sessões atualizadas no arquivo
@@ -110,11 +112,12 @@ viewSessions sessionsRef = do
 
 -- Função auxiliar para imprimir os detalhes de uma sessão
 printSessionDetails :: Session -> IO ()
-printSessionDetails (Session title time room date) = do
+printSessionDetails (Session title time room date price) = do
     putStrLn $ "Filme: " ++ title
     putStrLn $ "Horário: " ++ time
     putStrLn $ "Sala: " ++ room
     putStrLn $ "Data: " ++ date
+    putStrLn $ "Preço do Ingresso: R$ " ++ show price
     putStrLn "------------------------"
 
 -- Função principal de gerenciamento de sessões

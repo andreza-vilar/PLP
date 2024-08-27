@@ -52,11 +52,12 @@ viewSessions = do
 
 -- Função auxiliar para imprimir os detalhes de uma sessão
 printSessionDetails :: Session -> IO ()
-printSessionDetails (Session title time room date) = do
+printSessionDetails (Session title time room date price) = do
   putStrLn $ "Filme: " ++ title
   putStrLn $ "Data: " ++ date
   putStrLn $ "Horário: " ++ time
   putStrLn $ "Sala: " ++ room
+  putStrLn $ "Preço do Ingresso: R$ " ++ show price
   putStrLn "------------------------"
 
 -- Outras funções do cliente (mantidas)
