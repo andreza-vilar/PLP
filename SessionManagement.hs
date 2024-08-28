@@ -7,7 +7,15 @@ import Data.Time (getCurrentTime, utctDay)
 
 -- Definição dos tipos de usuário e sessão
 data UserType = Employee | Customer deriving (Eq, Show)
-data Session = Session { movieTitle :: String, time :: String, room :: String, date :: String, ticketPrice :: Double } deriving (Show, Read)
+data Session = Session 
+    { movieTitle :: String
+    , time :: String
+    , room :: String
+    , date :: String
+    , ticketPrice :: Double
+    , audioType :: String  -- Novo campo para tipo de áudio (Legendado/Dublado)
+    } deriving (Show, Read)
+
 
 -- Função para verificar se o usuário é funcionário
 isEmployee :: UserType -> Bool
@@ -46,13 +54,23 @@ addMultipleSessions sessionsRef = do
     sessionDate <- getLine
     putStrLn "Informe o preço do ingresso (por exemplo, 20.50)."
     price <- readLn :: IO Double
+    putStrLn "Informe o tipo de áudio (Legendado ou Dublado)."
+    audio <- getLine
 
-    let newSession = Session { movieTitle = title, time = sessionTime, room = sessionRoom, date = sessionDate, ticketPrice = price }
+    let newSession = Session 
+            { movieTitle = title
+            , time = sessionTime
+            , room = sessionRoom
+            , date = sessionDate
+            , ticketPrice = price
+            , audioType = audio  -- Inclui o tipo de áudio na nova sessão
+            }
     modifyIORef sessionsRef (\sessions -> newSession : sessions)
 
     -- Atualiza o arquivo sessions.txt com a nova sessão
     updatedSessions <- readIORef sessionsRef
     saveSessionsToFile updatedSessions
+
 
 -- Função para editar uma sessão de cinema
 editSession :: UserType -> IORef [Session] -> IO ()
@@ -69,10 +87,16 @@ editSession user sessionsRef =
         newDate <- getLine
         putStrLn "Informe o novo preço do ingresso (por exemplo, 25.00)."
         newPrice <- readLn :: IO Double
+        putStrLn "Informe o novo tipo de áudio (Legendado ou Dublado)."
+        newAudio <- getLine
 
         -- Atualizar a sessão na lista
         modifyIORef sessionsRef (map (\s -> if movieTitle s == title 
-                                            then s { time = newTime, room = newRoom, date = newDate, ticketPrice = newPrice }
+                                            then s { time = newTime
+                                                   , room = newRoom
+                                                   , date = newDate
+                                                   , ticketPrice = newPrice
+                                                   , audioType = newAudio }  -- Atualiza o tipo de áudio
                                             else s))
         
         -- Salvar as sessões atualizadas no arquivo
@@ -82,6 +106,7 @@ editSession user sessionsRef =
         putStrLn "Sessão editada com sucesso."
     else
         putStrLn "Apenas funcionários podem editar sessões."
+
 
 -- Função para remover uma sessão de cinema
 removeSession :: UserType -> IORef [Session] -> IO ()
@@ -112,13 +137,15 @@ viewSessions sessionsRef = do
 
 -- Função auxiliar para imprimir os detalhes de uma sessão
 printSessionDetails :: Session -> IO ()
-printSessionDetails (Session title time room date price) = do
+printSessionDetails (Session title time room date price audio) = do
     putStrLn $ "Filme: " ++ title
     putStrLn $ "Horário: " ++ time
     putStrLn $ "Sala: " ++ room
     putStrLn $ "Data: " ++ date
     putStrLn $ "Preço do Ingresso: R$ " ++ show price
+    putStrLn $ "Tipo de Áudio: " ++ audio  -- Exibe o tipo de áudio (Legendado/Dublado)
     putStrLn "------------------------"
+
 
 -- Função principal de gerenciamento de sessões
 manageSessions :: UserType -> IORef [Session] -> IO ()

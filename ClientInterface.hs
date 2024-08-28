@@ -54,12 +54,13 @@ viewSessions = do
 
 -- Função auxiliar para imprimir os detalhes de uma sessão
 printSessionDetails :: Session -> IO ()
-printSessionDetails (Session title time room date price) = do
+printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Filme: " ++ title
   putStrLn $ "Data: " ++ date
   putStrLn $ "Horário: " ++ time
   putStrLn $ "Sala: " ++ room
   putStrLn $ "Preço do Ingresso: R$ " ++ show price
+  putStrLn $ "Tipo de Áudio: " ++ audio
   putStrLn "------------------------"
 
 -- Função para comprar um ingresso (atualizada)
@@ -75,17 +76,18 @@ buyTicket = do
   withFile "sessions.txt" ReadMode $ \handle -> do
     contents <- hGetContents handle
     let sessions = read contents :: [Session]
-        foundSession = find (\(Session title time _ date _) -> 
+        foundSession = find (\(Session title time _ date _ _) -> 
                               title == movieTitle && date == sessionDate && time == sessionTime) sessions
 
     case foundSession of
-      Just (Session title time room date price) -> do
+      Just (Session title time room date price audio) -> do
         putStrLn $ "Sessão encontrada!"
         putStrLn $ "Filme: " ++ title
         putStrLn $ "Data: " ++ date
         putStrLn $ "Horário: " ++ time
         putStrLn $ "Sala: " ++ room
         putStrLn $ "Preço do Ingresso: R$ " ++ show price
+        putStrLn $ "Tipo de Áudio: " ++ audio
         
         putStrLn "Você é estudante e tem carteirinha? (s/n):"
         isStudent <- getLine
