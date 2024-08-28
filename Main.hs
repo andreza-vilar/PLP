@@ -3,8 +3,8 @@ module Main where
 import MovieManagement
 import SessionManagement
 import UserManagement
-import ReportGeneration
 import ConcessionStand
+import ReviewManagement (calculateAverageRating) -- Importa a função para cálculo das médias
 import ClientInterface (runClientMode) -- Importa a função runClientMode do módulo ClientInterface
 import Data.IORef (newIORef, IORef)
 
@@ -14,6 +14,14 @@ validateEmployeePassword = do
   putStrLn "Digite a senha de acesso para o modo Funcionário:"
   password <- getLine
   return (password == "admin")
+
+-- Função para gerar relatórios de avaliação
+generateReports :: IO ()
+generateReports = do
+  (infraAvg, foodAvg) <- calculateAverageRating
+  putStrLn "Relatório de Avaliações:"
+  putStrLn $ "Média das avaliações de infraestrutura: " ++ show infraAvg
+  putStrLn $ "Média das avaliações de comida: " ++ show foodAvg
 
 runEmployeeMode :: IO ()
 runEmployeeMode = do
@@ -40,11 +48,10 @@ employeeMenu sessionsRef = do
     "1" -> manageMovies >> employeeMenu sessionsRef
     "2" -> manageSessions Employee sessionsRef >> employeeMenu sessionsRef  -- Passa 'sessionsRef' como argumento
     "3" -> manageUsers >> employeeMenu sessionsRef
-    "4" -> generateReports >> employeeMenu sessionsRef
+    "4" -> generateReports >> employeeMenu sessionsRef -- Gera relatórios
     "5" -> manageConcessionStand >> employeeMenu sessionsRef
     "6" -> main -- Volta ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> employeeMenu sessionsRef
-
 
 main :: IO ()
 main = do

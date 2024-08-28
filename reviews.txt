@@ -1,0 +1,2 @@
+Infraestrutura: 1 | Comida: 1
+Infraestrutura: 1 | Comida: 1

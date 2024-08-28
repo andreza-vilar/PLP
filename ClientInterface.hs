@@ -4,6 +4,7 @@ import System.IO (withFile, IOMode(..), hGetContents)
 import Data.List (isPrefixOf, find)
 import SessionManagement (Session(..)) -- Importa o tipo Session do módulo SessionManagement
 import CinemaInfo (viewCinemaInfo)     -- Importa a função viewCinemaInfo do módulo CinemaInfo
+import ReviewManagement (leaveReview)  -- Importa a função leaveReview do módulo ReviewManagement
 
 -- Função para visualizar filmes (mantida)
 viewMovies :: IO ()
@@ -106,9 +107,9 @@ buyTicket = do
           "2" -> return () -- Volta ao menu anterior
           _   -> putStrLn "Opção inválida. Voltando ao menu anterior."
 
--- Função para deixar feedback (mantida)
+-- Função para deixar feedback
 giveFeedback :: IO ()
-giveFeedback = putStrLn "Deixar um feedback sobre o filme, sala ou comida."
+giveFeedback = leaveReview
 
 -- Menu do cliente (atualizado)
 runClientMode :: IO ()
@@ -118,7 +119,7 @@ runClientMode = do
   putStrLn "2) Visualizar Sessões Disponíveis"
   putStrLn "3) Comprar Ingresso"
   putStrLn "4) Comprar Item da Bomboniere"
-  putStrLn "5) Visualizar Informações do Cinema" -- Nova opção para visualizar as informações do cinema
+  putStrLn "5) Visualizar Informações do Cinema"
   putStrLn "6) Deixar Feedback"
   putStrLn "7) Voltar ao Menu Principal"
   option <- getLine
@@ -127,7 +128,7 @@ runClientMode = do
     "2" -> viewSessions >> runClientMode
     "3" -> buyTicket >> runClientMode
     "4" -> buyItem >> runClientMode
-    "5" -> viewCinemaInfo >> runClientMode -- Chama a função para exibir informações do cinema
+    "5" -> viewCinemaInfo >> runClientMode
     "6" -> giveFeedback >> runClientMode
     "7" -> return () -- Retorna ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
