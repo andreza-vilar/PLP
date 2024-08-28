@@ -5,6 +5,7 @@ import Data.List (isPrefixOf, find)
 import SessionManagement (Session(..)) -- Importa o tipo Session do módulo SessionManagement
 import CinemaInfo (viewCinemaInfo)     -- Importa a função viewCinemaInfo do módulo CinemaInfo
 import ReviewManagement (leaveReview)  -- Importa a função leaveReview do módulo ReviewManagement
+import FAQ (viewFAQ)
 
 -- Função para visualizar filmes (mantida)
 viewMovies :: IO ()
@@ -123,7 +124,8 @@ runClientMode = do
   putStrLn "4) Comprar Item da Bomboniere"
   putStrLn "5) Visualizar Informações do Cinema"
   putStrLn "6) Deixar Feedback"
-  putStrLn "7) Voltar ao Menu Principal"
+  putStrLn "7) Acessar FAQ"
+  putStrLn "8) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> viewMovies >> runClientMode
@@ -132,5 +134,6 @@ runClientMode = do
     "4" -> buyItem >> runClientMode
     "5" -> viewCinemaInfo >> runClientMode
     "6" -> giveFeedback >> runClientMode
-    "7" -> return () -- Retorna ao menu principal
+    "7" -> viewFAQ >> runClientMode
+    "8" -> return () -- Retorna ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
