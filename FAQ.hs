@@ -5,44 +5,54 @@ viewFAQ :: IO ()
 viewFAQ = do
     putStrLn "FAQ - Perguntas Frequentes"
     putStrLn "==========================="
-    putStrLn "\nSelecione uma opção:"
+    putStrLn "\nEscolha uma seção para mais informações:"
     putStrLn "1) Programação"
     putStrLn "2) Ingressos"
-    putStrLn "Pressione 'Enter' para voltar ao menu principal."
-    option <- getLine
-    handleFAQOption option
+    putStrLn "3) Voltar ao menu principal"
+    section <- getLine
+    case section of
+        "1" -> programmingFAQ
+        "2" -> ticketsFAQ
+        "3" -> return ()
+        _   -> putStrLn "Opção inválida. Tente novamente." >> viewFAQ
 
 -- Seção: Programação
 programmingFAQ :: IO ()
 programmingFAQ = do
-    putStrLn "Escolha uma pergunta sobre Programação:"
+    putStrLn "\nEscolha uma pergunta sobre Programação:"
     putStrLn "1) Como faço para consultar a programação?"
     putStrLn "2) Quando o filme possui classificação indicativa, como proceder?"
     putStrLn "3) Por que são exibidas mais sessões dubladas?"
     putStrLn "4) Por quanto tempo um filme permanece em exibição?"
-    question <- getLine
-    answerProgrammingFAQ (read question)
+    putStrLn "5) Voltar"
+    putStrLn "Caso sua dúvida não tenha sido esclarecida, envie mensagem para o número 4002-8922"
+    option <- getLine
+    case option of
+        "1" -> answerProgrammingFAQ 1 >> programmingFAQ
+        "2" -> answerProgrammingFAQ 2 >> programmingFAQ
+        "3" -> answerProgrammingFAQ 3 >> programmingFAQ
+        "4" -> answerProgrammingFAQ 4 >> programmingFAQ
+        "5" -> viewFAQ
+        _   -> putStrLn "Opção inválida. Tente novamente." >> programmingFAQ
 
 -- Seção: Ingressos
 ticketsFAQ :: IO ()
 ticketsFAQ = do
-    putStrLn "Escolha uma pergunta sobre Ingressos:"
+    putStrLn "\nEscolha uma pergunta sobre Ingressos:"
     putStrLn "1) Como consulto o valor do ingresso?"
     putStrLn "2) Quais são as formas de pagamento?"
     putStrLn "3) Aniversariante tem entrada gratuita?"
     putStrLn "4) Quero fechar uma sala para meus convidados. Como faço?"
-    question <- getLine
-    answerTicketsFAQ (read question)
-
--- Função para tratar a opção escolhida pelo usuário no FAQ
-handleFAQOption :: String -> IO ()
-handleFAQOption "1" = do
-    programmingFAQ
-    viewFAQ  -- Retorna ao menu principal após exibir a resposta
-handleFAQOption "2" = do
-    ticketsFAQ
-    viewFAQ  -- Retorna ao menu principal após exibir a resposta
-handleFAQOption _ = return ()
+    putStrLn "5) Voltar"
+    putStrLn "Caso sua dúvida não tenha sido esclarecida, envie mensagem para o número 4002-8922"
+    option <- getLine
+    case option of
+        "1" -> answerTicketsFAQ 1 >> ticketsFAQ
+        "2" -> answerTicketsFAQ 2 >> ticketsFAQ
+        "3" -> answerTicketsFAQ 3 >> ticketsFAQ
+        "4" -> answerTicketsFAQ 4 >> ticketsFAQ
+        "5" -> viewFAQ
+        _   -> putStrLn "Opção inválida. Tente novamente." >> ticketsFAQ
 
 -- Respostas para as perguntas sobre Programação
 answerProgrammingFAQ :: Int -> IO ()
