@@ -15,6 +15,14 @@ viewMovies = do
     putStrLn "Lista de filmes disponíveis:"
     putStrLn contents
 
+-- Função para visualizar lançamentos futuros (nova)
+viewUpcomingMovies :: IO ()
+viewUpcomingMovies = do
+  withFile "upcoming_movies.txt" ReadMode $ \handle -> do
+    contents <- hGetContents handle
+    putStrLn "Lista de lançamentos futuros:"
+    putStrLn contents
+
 -- Função para visualizar itens da bomboniere (mantida)
 viewItems :: IO [String]
 viewItems = do
@@ -42,7 +50,7 @@ buyItem = do
         Just _  -> putStrLn ("Você comprou o item: " ++ itemName)
         Nothing -> putStrLn "Item não encontrado. Voltando ao menu principal."
 
--- Função para visualizar sessões de cinema
+-- Função para visualizar sessões de cinema (mantida)
 viewSessions :: IO ()
 viewSessions = do
   withFile "sessions.txt" ReadMode $ \handle -> do
@@ -53,7 +61,7 @@ viewSessions = do
       then putStrLn "Nenhuma sessão disponível."
       else mapM_ printSessionDetails sessions
 
--- Função auxiliar para imprimir os detalhes de uma sessão
+-- Função auxiliar para imprimir os detalhes de uma sessão (mantida)
 printSessionDetails :: Session -> IO ()
 printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Filme: " ++ title
@@ -64,7 +72,7 @@ printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Tipo de Áudio: " ++ audio
   putStrLn "------------------------"
 
--- Função para comprar um ingresso (atualizada)
+-- Função para comprar um ingresso (mantida)
 buyTicket :: IO ()
 buyTicket = do
   putStrLn "Digite o título do filme para o qual deseja comprar o ingresso:"
@@ -110,7 +118,7 @@ buyTicket = do
           "2" -> return () -- Volta ao menu anterior
           _   -> putStrLn "Opção inválida. Voltando ao menu anterior."
 
--- Função para deixar feedback
+-- Função para deixar feedback (mantida)
 giveFeedback :: IO ()
 giveFeedback = leaveReview
 
@@ -120,20 +128,22 @@ runClientMode = do
   putStrLn "Modo Cliente:"
   putStrLn "1) Visualizar Filmes"
   putStrLn "2) Visualizar Sessões Disponíveis"
-  putStrLn "3) Comprar Ingresso"
-  putStrLn "4) Comprar Item da Bomboniere"
-  putStrLn "5) Visualizar Informações do Cinema"
-  putStrLn "6) Deixar Feedback"
-  putStrLn "7) Acessar FAQ"
-  putStrLn "8) Voltar ao Menu Principal"
+  putStrLn "3) Visualizar Lançamentos Futuros"  -- Nova opção
+  putStrLn "4) Comprar Ingresso"
+  putStrLn "5) Comprar Item da Bomboniere"
+  putStrLn "6) Visualizar Informações do Cinema"
+  putStrLn "7) Deixar Feedback"
+  putStrLn "8) Acessar FAQ"
+  putStrLn "9) Voltar ao Menu Principal"
   option <- getLine
   case option of
     "1" -> viewMovies >> runClientMode
     "2" -> viewSessions >> runClientMode
-    "3" -> buyTicket >> runClientMode
-    "4" -> buyItem >> runClientMode
-    "5" -> viewCinemaInfo >> runClientMode
-    "6" -> giveFeedback >> runClientMode
-    "7" -> viewFAQ >> runClientMode
-    "8" -> return () -- Retorna ao menu principal
+    "3" -> viewUpcomingMovies >> runClientMode  -- Nova opção
+    "4" -> buyTicket >> runClientMode
+    "5" -> buyItem >> runClientMode
+    "6" -> viewCinemaInfo >> runClientMode
+    "7" -> giveFeedback >> runClientMode
+    "8" -> viewFAQ >> runClientMode
+    "9" -> return () -- Retorna ao menu principal
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
