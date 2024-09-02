@@ -1,0 +1,14 @@
+Pipoca P | R$ 3
+
+Pipoca M | R$ 4
+
+Pipoca G | R$ 6
+
+Refrigerante 500ml | R$ 6
+
+Refrigerante 700ml | R$ 7
+
+Agua | R$ 2,50
+
+Suco 250ml | R$ 5,50
+

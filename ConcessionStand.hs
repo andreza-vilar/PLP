@@ -25,17 +25,17 @@ addItem = do
 -- Função para listar todos os itens da bomboniere
 listItems :: IO [String]
 listItems = do
-  withFile fileName ReadMode $ \handle -> do
-    contents <- hGetContents handle
-    let items = lines contents
-    if null items
-      then do
-        putStrLn "Nenhum item disponível na bomboniere."
-        return []
-      else do
-        putStrLn "Itens da bomboniere:"
-        mapM_ putStrLn items
-        return items
+  contents <- readFile fileName
+  let items = lines contents
+  if null items
+    then do
+      putStrLn "Nenhum item disponível na bomboniere."
+      return []
+    else do
+      putStrLn "Itens da bomboniere:"
+      mapM_ putStrLn items
+      return items
+
 
 -- Função para editar um item na bomboniere
 editItem :: IO ()
@@ -50,10 +50,10 @@ editItem = do
       newName <- getLine
       putStrLn "Digite o novo preço do item (ou deixe em branco para manter o mesmo):"
       newPrice <- getLine
-      contents <- readFile fileName
-      let updatedItems = map (updateItem oldName newName newPrice) (lines contents)
+      let updatedItems = map (updateItem oldName newName newPrice) items
       writeFile fileName (unlines updatedItems)
       putStrLn "Item atualizado com sucesso."
+
 
 -- Função auxiliar para atualizar um item
 updateItem :: String -> String -> String -> String -> String
