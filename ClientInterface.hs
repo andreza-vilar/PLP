@@ -146,4 +146,8 @@ runClientMode = do
     "7" -> giveFeedback >> runClientMode
     "8" -> viewFAQ >> runClientMode
     "9" -> return () -- Retorna ao menu principal
+<<<<<<< HEAD
     _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
+=======
+    _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
+>>>>>>> cd6d176a27d41dbef192e79786cee5fc29600cac

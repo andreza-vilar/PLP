@@ -110,4 +110,8 @@ manageMovies = do
     "5" -> listUpcomingMovies >> manageMovies
     "6" -> removeMovie >> manageMovies
     "7" -> putStrLn "Voltando ao menu anterior."
+<<<<<<< HEAD
     _   -> putStrLn "Opção inválida. Tente novamente." >> manageMovies
+=======
+    _   -> putStrLn "Opção inválida. Tente novamente." >> manageMovies
+>>>>>>> cd6d176a27d41dbef192e79786cee5fc29600cac

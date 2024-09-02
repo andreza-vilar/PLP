@@ -71,4 +71,8 @@ manageUsers = do
     "2" -> editUser >> manageUsers
     "3" -> removeUser >> manageUsers
     "4" -> putStrLn "Voltando ao menu anterior."
+<<<<<<< HEAD
     _   -> putStrLn "Opção inválida. Tente novamente." >> manageUsers
+=======
+    _   -> putStrLn "Opção inválida. Tente novamente." >> manageUsers
+>>>>>>> cd6d176a27d41dbef192e79786cee5fc29600cac
