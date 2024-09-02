@@ -1,5 +1,0 @@
-Infraestrutura: 1 | Comida: 1
-Infraestrutura: 1 | Comida: 1
-Infraestrutura: 5 | Comida: 5
-Infraestrutura: 10 | Comida: 10
-Infraestrutura: 1 | Comida: 1

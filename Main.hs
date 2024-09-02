@@ -93,8 +93,4 @@ showMainMenu welcomeMessageShownRef = do
       showWelcomeMessage
       writeIORef welcomeMessageShownRef False
     else return ()
-<<<<<<< HEAD
   mainMenu
-=======
-  mainMenu
->>>>>>> cd6d176a27d41dbef192e79786cee5fc29600cac

@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-Upcoming Movie: deadpool | marvel | 01/09/2024 | 18+ | 200 min
-=======
-Upcoming Movie: deadpool | marvel | 01/09/2024 | 18+ | 200 min
->>>>>>> cd6d176a27d41dbef192e79786cee5fc29600cac

@@ -1,1 +1,1 @@
-[Session {movieTitle = "mamamia", time = "15:30", room = "2", date = "01/09", ticketPrice = 16.0, audioType = "Dublado"},Session {movieTitle = "mamamia", time = "17:30", room = "1", date = "01/09", ticketPrice = 10.0, audioType = "Legendado"}]
+[Session {movieTitle = "Mamma mia", time = "15:00", room = "3", date = "01/09", ticketPrice = 10.0, audioType = "dublado"}]
