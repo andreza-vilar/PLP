@@ -25,3 +25,4 @@ O sistema tem como objetivo melhorar a eficiência do gerenciamento do cinema e 
   - Monitoramento e gestão de reservas.
   - Geração de relatórios sobre a ocupação das sessões.
   - Controle(adição, precificação, remoção) de itens da bomboniere.
+  - A senha de autenticação para entrar no modo funcionário é: admin
