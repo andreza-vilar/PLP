@@ -59,7 +59,8 @@ buyItem = do
         Nothing -> putStrLn "Item não encontrado. Voltando ao menu principal."
 
 -- Função para visualizar sessões de cinema (mantida)
--- Função para visualizar sessões de cinema (mantida)
+
+
 viewSessions :: IO ()
 viewSessions = do
   withFile "sessions.txt" ReadMode $ \handle -> do
@@ -71,7 +72,7 @@ viewSessions = do
       else mapM_ printSessionDetails sessions
 
 -- Função auxiliar para imprimir os detalhes de uma sessão (mantida)
--- Função auxiliar para imprimir os detalhes de uma sessão (mantida)
+
 printSessionDetails :: Session -> IO ()
 printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Filme: " ++ title
@@ -83,7 +84,7 @@ printSessionDetails (Session title time room date price audio) = do
   putStrLn "------------------------"
 
 -- Função para comprar um ingresso (mantida)
--- Função para comprar um ingresso (mantida)
+
 buyTicket :: IO ()
 buyTicket = do
   putStrLn "Digite o título do filme para o qual deseja comprar o ingresso:"
@@ -130,8 +131,7 @@ buyTicket = do
           _   -> putStrLn "Opção inválida. Voltando ao menu anterior."
 
 -- Função para deixar feedback (mantida)
--- Função para deixar feedback (mantida)
-giveFeedback :: IO ()
+
 giveFeedback = leaveReview
 
 -- Menu do cliente (atualizado)
@@ -147,13 +147,7 @@ runClientMode = do
   putStrLn "7) Deixar Feedback"
   putStrLn "8) Acessar FAQ"
   putStrLn "9) Voltar ao Menu Principal"
-  putStrLn "3) Visualizar Lançamentos Futuros"  -- Nova opção
-  putStrLn "4) Comprar Ingresso"
-  putStrLn "5) Comprar Item da Bomboniere"
-  putStrLn "6) Visualizar Informações do Cinema"
-  putStrLn "7) Deixar Feedback"
-  putStrLn "8) Acessar FAQ"
-  putStrLn "9) Voltar ao Menu Principal"
+
   option <- getLine
   case option of
     "1" -> viewMovies >> runClientMode
@@ -165,11 +159,4 @@ runClientMode = do
     "7" -> giveFeedback >> runClientMode
     "8" -> viewFAQ >> runClientMode
     "9" -> return () -- Retorna ao menu principal
-    "3" -> viewUpcomingMovies >> runClientMode  -- Nova opção
-    "4" -> buyTicket >> runClientMode
-    "5" -> buyItem >> runClientMode
-    "6" -> viewCinemaInfo >> runClientMode
-    "7" -> giveFeedback >> runClientMode
-    "8" -> viewFAQ >> runClientMode
-    "9" -> return () -- Retorna ao menu principal
-    _   -> putStrLn "Opção inválida. Tente novamente." >> runClientMode
+
