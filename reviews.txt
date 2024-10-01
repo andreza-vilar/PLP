@@ -1,1 +1,1 @@
-Infraestrutura: 8 | Comida: 8
+Infraestrutura: 8 | Comida: 9

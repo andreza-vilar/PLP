@@ -95,7 +95,7 @@ buyItems = do
       if itemToBuy == "voltar"
         then return () -- Volta ao menu principal
         else putStrLn $ "Você comprou: " ++ itemToBuy
-        -- Aqui pode adicionar funcionalidades para processar a compra, se necessário
+        -- Aqui você pode adicionar funcionalidades para processar a compra, se necessário
 
 -- Menu de gerenciamento da bomboniere
 manageConcessionStand :: IO ()
