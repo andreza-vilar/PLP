@@ -2,12 +2,12 @@ module ClientInterface where
 
 import System.IO (withFile, IOMode(..), hGetContents)
 import Data.List (isPrefixOf, find)
-import SessionManagement (Session(..)) -- Importa o tipo Session do módulo SessionManagement
-import CinemaInfo (viewCinemaInfo)     -- Importa a função viewCinemaInfo do módulo CinemaInfo
-import ReviewManagement (leaveReview)  -- Importa a função leaveReview do módulo ReviewManagement
+import SessionManagement (Session(..))
+import CinemaInfo (viewCinemaInfo)
+import ReviewManagement (leaveReview)
 import FAQ (viewFAQ)
 
--- Função para visualizar filmes (mantida)
+-- Função para visualizar filmes
 viewMovies :: IO ()
 viewMovies = do
   withFile "movies.txt" ReadMode $ \handle -> do
@@ -15,7 +15,7 @@ viewMovies = do
     putStrLn "Lista de filmes disponíveis:"
     putStrLn contents
 
--- Função para visualizar lançamentos futuros (nova)
+-- Função para visualizar lançamentos futuros
 viewUpcomingMovies :: IO ()
 viewUpcomingMovies = do
   withFile "upcoming_movies.txt" ReadMode $ \handle -> do
@@ -23,15 +23,7 @@ viewUpcomingMovies = do
     putStrLn "Lista de lançamentos futuros:"
     putStrLn contents
 
--- Função para visualizar lançamentos futuros (nova)
-viewUpcomingMovies :: IO ()
-viewUpcomingMovies = do
-  withFile "upcoming_movies.txt" ReadMode $ \handle -> do
-    contents <- hGetContents handle
-    putStrLn "Lista de lançamentos futuros:"
-    putStrLn contents
-
--- Função para visualizar itens da bomboniere (mantida)
+-- Função para visualizar itens da bomboniere
 viewItems :: IO [String]
 viewItems = do
   withFile "concessionStand.txt" ReadMode $ \handle -> do
@@ -44,23 +36,20 @@ viewItems = do
         mapM_ putStrLn items
         return items
 
--- Função para comprar um item da bomboniere (mantida)
+-- Função para comprar um item da bomboniere
 buyItem :: IO ()
 buyItem = do
   items <- viewItems
   if null items
-    then putStrLn "Voltando ao menu principal..." -- Caso não haja itens, volta ao menu principal
+    then putStrLn "Voltando ao menu principal..."
     else do
       putStrLn "Digite o nome do item que deseja comprar:"
       itemName <- getLine
-      -- Verifica se o item existe na lista de itens disponíveis
       case find (isPrefixOf itemName) items of
         Just _  -> putStrLn ("Você comprou o item: " ++ itemName)
         Nothing -> putStrLn "Item não encontrado. Voltando ao menu principal."
 
--- Função para visualizar sessões de cinema (mantida)
-
-
+-- Função para visualizar sessões de cinema
 viewSessions :: IO ()
 viewSessions = do
   withFile "sessions.txt" ReadMode $ \handle -> do
@@ -71,8 +60,7 @@ viewSessions = do
       then putStrLn "Nenhuma sessão disponível."
       else mapM_ printSessionDetails sessions
 
--- Função auxiliar para imprimir os detalhes de uma sessão (mantida)
-
+-- Função auxiliar para imprimir os detalhes de uma sessão
 printSessionDetails :: Session -> IO ()
 printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Filme: " ++ title
@@ -83,8 +71,7 @@ printSessionDetails (Session title time room date price audio) = do
   putStrLn $ "Tipo de Áudio: " ++ audio
   putStrLn "------------------------"
 
--- Função para comprar um ingresso (mantida)
-
+-- Função para comprar um ingresso
 buyTicket :: IO ()
 buyTicket = do
   putStrLn "Digite o título do filme para o qual deseja comprar o ingresso:"
@@ -130,8 +117,7 @@ buyTicket = do
           "2" -> return () -- Volta ao menu anterior
           _   -> putStrLn "Opção inválida. Voltando ao menu anterior."
 
--- Função para deixar feedback (mantida)
-
+-- Função para deixar feedback
 giveFeedback = leaveReview
 
 -- Menu do cliente (atualizado)
@@ -159,4 +145,3 @@ runClientMode = do
     "7" -> giveFeedback >> runClientMode
     "8" -> viewFAQ >> runClientMode
     "9" -> return () -- Retorna ao menu principal
-
