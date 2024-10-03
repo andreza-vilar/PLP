@@ -1,24 +1,29 @@
 :- dynamic filme/6.  % Dinâmico para permitir adição e remoção
 
-% Carregar filmes do arquivo ao iniciar o sistema
 carregar_filmes :- 
-    (   exists_file('filmes.txt') ->  % Verifica se o arquivo existe
+    (   exists_file('filmes.txt') -> 
         open('filmes.txt', read, Stream),
         repeat,
-        read(Stream, Filme),
-        (   Filme == end_of_file -> ! ;
-            assertz(Filme),
-            fail
+        (   read(Stream, Filme) -> 
+            (   Filme == end_of_file -> ! ; 
+                assertz(Filme), 
+                fail 
+            )
+        ;   % Ignora entradas inválidas
+            writeln('Entrada inválida no arquivo filmes.txt. Ignorando.'),
+            fail 
         ),
         close(Stream)
-    ;   true  % Se o arquivo não existe, não faz nada
+    ;   true
     ).
+
 
 % Salvar filmes no arquivo
 salvar_filmes :- 
     open('filmes.txt', write, Stream),
     forall(filme(ID, Titulo, Diretor, Ano, Classificacao, Duracao), 
-           writeln(Stream, filme(ID, Titulo, Diretor, Ano, Classificacao, Duracao))),
+           format(Stream, 'filme(~w, \'~w\', \'~w\', ~w, \'~w\', ~w).~n', 
+                  [ID, Titulo, Diretor, Ano, Classificacao, Duracao])),
     close(Stream).
 
 % Adicionar filme
