@@ -1,4 +1,4 @@
-:- dynamic filme/5.  % Dinâmico para permitir adição e remoção
+:- dynamic filme/6.  % Dinâmico para permitir adição e remoção
 
 % Carregar filmes do arquivo ao iniciar o sistema
 carregar_filmes :- 
@@ -19,7 +19,6 @@ salvar_filmes :-
     open('filmes.txt', write, Stream),
     forall(filme(ID, Titulo, Diretor, Ano, Classificacao, Duracao), 
            writeln(Stream, filme(ID, Titulo, Diretor, Ano, Classificacao, Duracao))),
-    write(Stream, end_of_file),
     close(Stream).
 
 % Adicionar filme
@@ -53,7 +52,7 @@ exibir_filmes :-
     ).
 
 % Função para gerenciar filmes
-gerenciar_filmes :-
+gerenciar_filmes :- 
     writeln('Gerenciamento de Filmes:'),
     writeln('1) Adicionar Filme'),
     writeln('2) Editar Filme'),
