@@ -1,138 +1,85 @@
-% Inicializa o sistema
-:- dynamic(filme/5).  % Declara que filme/5 pode ser dinâmico (adicionado/removido)
+% Importa os modulos necessários
+:- consult('filmes.pl').  % Apenas o modulo de filmes por enquanto
+% Adicione os outros modulos conforme necessário
 
+% Função principal para iniciar o sistema
 iniciar :- 
-    write('Bem-vindo ao Sistema de Gerenciamento de Cinema!'), nl,
-    write('Escolha o modo de operação:'), nl,
-    write('1. Modo Funcionário'), nl,
-    write('2. Modo Cliente'), nl,
+    writeln('Bem-vindo ao Sistema de Gerenciamento do Cinema!'),
+    writeln('Você é cliente ou funcionário?'),
+    writeln('1. Funcionário'),
+    writeln('2. Cliente'),
+    writeln('3. Sair'),
     read(Opcao),
-    selecionar_modo(Opcao).
+    processar_opcao(Opcao).
 
-% Seleciona o modo de operação
-selecionar_modo(1) :- 
-    entrar_modo_funcionario.
-selecionar_modo(2) :- 
-    entrar_modo_cliente.
-selecionar_modo(_) :- 
-    write('Opção inválida, tente novamente.'), nl,
+% Processar a opção inicial do usuário
+processar_opcao(1) :- autenticar_funcionario.
+processar_opcao(2) :- menu_cliente.
+processar_opcao(3) :- 
+    writeln('Saindo do sistema. Até logo!').
+processar_opcao(_) :- 
+    writeln('Opção inválida. Tente novamente.'), 
     iniciar.
 
-% Modo funcionário com verificação de senha
-entrar_modo_funcionario :- 
-    write('Digite a senha de administrador: '), nl,
+% Autenticação do funcionário
+autenticar_funcionario :-
+    writeln('Por favor, insira a senha de administrador:'),
     read(Senha),
-    (Senha = admin -> 
-        write('Bem-vindo, Funcionario!'), nl, 
-        menu_funcionario; 
-        write('Senha incorreta! Acesso negado.'), nl, 
-        iniciar).
+    validar_senha(Senha).
 
-% Modo cliente
-entrar_modo_cliente :- 
-    write('Bem-vindo, Cliente!'), nl, 
-    menu_cliente.
+% Validação da senha do funcionário
+validar_senha(Senha) :-
+    Senha == 'admin',
+    writeln('Autenticação bem-sucedida!'),
+    menu_funcionario.
 
-% Menu de opções para o funcionário
+validar_senha(_) :-
+    writeln('Senha incorreta. Tente novamente.'),
+    iniciar.
+
+% Menu para funcionários com acesso privilegiado
 menu_funcionario :- 
-    write('Escolha uma opção:'), nl,
-    write('1. Gerenciar Filmes'), nl,
-    write('2. Gerenciar Sessões'), nl,
-    write('3. Gerenciar Usuários'), nl,
-    write('4. Gerar Relatórios'), nl,
-    write('5. Sair'), nl,
-    read(Opcao),
-    executar_opcao_funcionario(Opcao).
+    writeln('Menu do Funcionário:'),
+    writeln('1. Gerenciar filmes'),
+    writeln('2. Gerenciar sessões'),
+    writeln('3. Gerenciar usuários'),
+    writeln('4. Gerar relatórios'),
+    writeln('5. Gerenciar bomboniere'),
+    writeln('6. Voltar ao menu principal'),
+    writeln('7. Sair'),  % Adiciona a opção de sair
+    read(OpcaoFuncionario),
+    processar_opcao_funcionario(OpcaoFuncionario).
 
-% Menu de opções para o cliente
+% Processamento das opções do funcionário
+processar_opcao_funcionario(1) :- gerenciar_filmes, menu_funcionario.
+processar_opcao_funcionario(2) :- menu_sessoes, menu_funcionario.
+processar_opcao_funcionario(3) :- menu_usuarios, menu_funcionario.
+processar_opcao_funcionario(4) :- gerar_relatorio_avaliacoes, menu_funcionario.
+processar_opcao_funcionario(5) :- menu_bomboniere, menu_funcionario.
+processar_opcao_funcionario(6) :- iniciar.  % Volta ao menu principal
+processar_opcao_funcionario(7) :- 
+    writeln('Voltando ao menu anterior...'), 
+    iniciar.  % Retorna ao menu anterior
+processar_opcao_funcionario(_) :- 
+    writeln('Opção inválida. Tente novamente.'),
+    menu_funcionario.
+
+
+% Menu para clientes (exemplo, você pode expandir)
 menu_cliente :- 
-    write('Escolha uma opção:'), nl,
-    write('1. Visualizar Filmes'), nl,
-    write('2. Comprar Ingressos'), nl,
-    write('3. Avaliar Sessões'), nl,
-    write('4. Sair'), nl,
-    read(Opcao),
-    executar_opcao_cliente(Opcao).
+    writeln('Menu do Cliente:'),
+    writeln('1. Comprar ingresso'),
+    writeln('2. Avaliar sala/comida'),
+    writeln('3. Voltar ao menu principal'),
+    writeln('4. Sair'),
+    read(OpcaoCliente),
+    processar_opcao_cliente(OpcaoCliente).
 
-% Executa a opção escolhida pelo funcionário
-executar_opcao_funcionario(1) :- 
-    gerenciar_filmes.
-executar_opcao_funcionario(5) :- 
-    write('Saindo...'), nl.
-executar_opcao_funcionario(_) :- 
-    write('Opção inválida, tente novamente.'), nl, 
-    menu_funcionario.
-
-% Gerenciar filmes
-gerenciar_filmes :-
-    write('Gerenciamento de Filmes.'), nl,
-    write('Escolha uma opção:'), nl,
-    write('1. Adicionar Filme'), nl,
-    write('2. Editar Filme'), nl,
-    write('3. Remover Filme'), nl,
-    write('4. Listar Filmes'), nl,
-    write('5. Voltar'), nl,
-    read(Op), 
-    executar_opcao_filmes(Op).
-
-% Executa a opção escolhida no gerenciamento de filmes
-executar_opcao_filmes(1) :- 
-    adicionar_filme.
-executar_opcao_filmes(2) :- 
-    write('Editar Filme (implementação ainda não feita).'), nl,
-    gerenciar_filmes.
-executar_opcao_filmes(3) :- 
-    write('Remover Filme (implementação ainda não feita).'), nl,
-    gerenciar_filmes.
-executar_opcao_filmes(4) :- 
-    listar_filmes,
-    gerenciar_filmes.
-executar_opcao_filmes(5) :- 
-    menu_funcionario.
-executar_opcao_filmes(_) :- 
-    write('Opção inválida, tente novamente.'), nl,
-    gerenciar_filmes.
-
-% Adiciona um filme à lista
-adicionar_filme :-
-    write('Digite o nome do filme: '), nl,
-    read(Nome),
-    write('Digite o diretor do filme: '), nl,
-    read(Diretor),
-    write('Digite o ano de lançamento: '), nl,
-    read(Ano),
-    write('Digite a classificação (por exemplo, PG-13): '), nl,
-    read(Classificacao),
-    write('Digite a duração em minutos: '), nl,
-    read(Duracao),
-    assertz(filme(Nome, Diretor, Ano, Classificacao, Duracao)),  % Adiciona o filme
-    write('Filme adicionado com sucesso!'), nl,
-    gerenciar_filmes.
-
-% Lista todos os filmes
-listar_filmes :-
-    write('Filmes cadastrados:'), nl,
-    findall(Nome, filme(Nome, _, _, _, _), Lista),  % Encontra todos os nomes dos filmes
-    (Lista \= [] -> 
-        listar_filmes_aux(Lista); 
-        write('Nenhum filme cadastrado.'), nl).
-
-% Função auxiliar para listar os filmes
-listar_filmes_aux([]).
-listar_filmes_aux([H|T]) :- 
-    filme(H, Diretor, Ano, Classificacao, Duracao), 
-    format('Nome: ~w, Diretor: ~w, Ano: ~w, Classificação: ~w, Duração: ~w minutos~n', [H, Diretor, Ano, Classificacao, Duracao]),
-    listar_filmes_aux(T).
-
-% Executa a opção escolhida pelo cliente
-executar_opcao_cliente(1) :- 
-    write('Visualização de Filmes.'), nl,
+processar_opcao_cliente(1) :- writeln('Comprar ingresso.').
+processar_opcao_cliente(2) :- writeln('Avaliar sala/comida.').
+processar_opcao_cliente(3) :- iniciar.
+processar_opcao_cliente(4) :- 
+    writeln('Saindo do sistema. Até logo!').
+processar_opcao_cliente(_) :- 
+    writeln('Opção inválida. Tente novamente.'),
     menu_cliente.
-executar_opcao_cliente(4) :- 
-    write('Saindo...'), nl.
-executar_opcao_cliente(_) :- 
-    write('Opção inválida, tente novamente.'), nl,
-    menu_cliente.
-
-% Para iniciar o sistema, chame:
-% ?- iniciar.
