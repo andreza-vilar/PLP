@@ -1,11 +1,11 @@
-% Importação dos mdulos necessários
+% Importação dos modulos necessários
 :- ensure_loaded('MovieManagement').
 :- ensure_loaded('SessionManagement').
 :- ensure_loaded('UserManagement').
-:- ensure_loaded('ConcessionStand').  
-:- ensure_loaded('ReviewManagement').  
-:- ensure_loaded('ClientInterface').   
-:- ensure_loaded('FAQ').              
+:- ensure_loaded('ConcessionStand').
+:- ensure_loaded('ReviewManagement').
+:- ensure_loaded('ClientInterface').
+:- ensure_loaded('FAQ').
 
 % Exibir a mensagem de boas-vindas
 show_welcome_message :-
@@ -15,7 +15,7 @@ show_welcome_message :-
     write('   ██║   ██╔══██║██╔═══╝ ██╔══╝  ██╔══██╗██║   ██║██╔══██║'), nl,
     write('   ██║   ██║  ██║██║     ███████╗██║  ██║╚██████╔╝██║  ██║'), nl,
     write('   ╚═╝   ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝'), nl,
-    write('███████╗██╗██╗     ███╗   ███╗███████╗███████╗    ██╗     '), nl,
+    write('███████╗██╗██╗     ███╗   ███╗███████╗███████║    ██╗     '), nl,
     write('██╔════╝██║██║     ████╗ ████║██╔════╝██╔════╝    ██║     '), nl,
     write('█████╗  ██║██║     ██╔████╔██║█████╗  ███████╗    ██║     '), nl,
     write('██╔══╝  ██║██║     ██║╚██╔╝██║██╔══╝  ╚════██║    ╚═╝     '), nl,
@@ -60,7 +60,7 @@ handle_employee_option(1) :-
     manage_movies,
     employee_menu.
 handle_employee_option(2) :-
-    manage_sessions(employee),
+    manage_sessions,  % Chamada corrigida para manage_sessions/0
     employee_menu.
 handle_employee_option(3) :-
     manage_users,

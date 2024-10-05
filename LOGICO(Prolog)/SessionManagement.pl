@@ -1,19 +1,18 @@
-:- dynamic session/6.
+:- dynamic session/6.  % Para permitir a adição e remoção dinâmica de sessões
 
-% session(Titulo, Horario, Sala, Data, Preco, TipoAudio).
-
-% Adiciona uma nova sessão (Apenas Funcionários)
-add_session(Employee) :-
-    Employee = 'Employee',
-    write('Informe o título do filme: '), read(Title),
-    write('Informe o horário da sessão (por exemplo, 15:00): '), read(Time),
-    write('Informe a sala (por exemplo, Sala 3): '), read(Room),
-    write('Informe a data de exibição do filme no formato DD/MM (por exemplo, 25/08): '), read(Date),
-    write('Informe o preço do ingresso (por exemplo, 20.50): '), read(Price),
-    write('Informe o tipo de áudio (Legendado ou Dublado): '), read(Audio),
-    assertz(session(Title, Time, Room, Date, Price, Audio)),
-    save_sessions,
-    write('Sessão adicionada com sucesso.'), nl.
+% Adiciona uma sessão ao arquivo e à base de dados dinâmica
+add_session(ID, Title, Time, Room, Date, Price, Audio) :-
+    assertz(session(ID, Title, Time, Room, Date, Price, Audio)),  % Adiciona ao banco de dados dinâmico
+    open('sessions.txt', append, Stream),
+    write(Stream, ID), write(Stream, ';'),
+    write(Stream, Title), write(Stream, ';'),
+    write(Stream, Time), write(Stream, ';'),
+    write(Stream, Room), write(Stream, ';'),
+    write(Stream, Date), write(Stream, ';'),
+    write(Stream, Price), write(Stream, ';'),
+    write(Stream, Audio), write(Stream, '\n'),
+    close(Stream),
+    write('Sessão adicionada com sucesso!'), nl.
 
 % Edita uma sessão existente (Apenas Funcionários)
 edit_session(Employee) :-
@@ -38,17 +37,13 @@ remove_session(Employee) :-
     save_sessions,
     write('Sessão removida com sucesso.'), nl.
 
-% Exibe todas as sessões (Clientes e Funcionários)
-view_sessions(_) :-
-    forall(session(Title, Time, Room, Date, Price, Audio),
-        (   write('Filme: '), write(Title), nl,
-            write('Horário: '), write(Time), nl,
-            write('Sala: '), write(Room), nl,
-            write('Data: '), write(Date), nl,
-            write('Preço do Ingresso: R$ '), write(Price), nl,
-            write('Tipo de Áudio: '), write(Audio), nl,
-            write('------------------------'), nl
-        )
+% Função para listar as sessões
+list_sessions :-
+    write('Lista de Sessões:'), nl,
+    (   session(ID, MovieName, StartTime, EndTime, Room) ->
+        format('ID: ~w, Filme: ~w, Início: ~w, Fim: ~w, Sala: ~w', [ID, MovieName, StartTime, EndTime, Room]), nl,
+        fail  % Força a busca por mais sessões
+    ;   write('Nenhuma sessão encontrada.'), nl
     ).
 
 % Função para salvar as sessões no arquivo
@@ -71,32 +66,46 @@ load_sessions :-
     close(Stream).
 
 % Menu de gerenciamento de sessões
-manage_sessions(UserType) :-
-    write('1) Criar Sessão'), nl,
-    write('2) Editar Sessão'), nl,
-    write('3) Remover Sessão'), nl,
-    write('4) Visualizar Sessões'), nl,
-    write('5) Voltar ao Menu Principal'), nl,
+manage_sessions :- 
+    write('Gerenciamento de Sessões:'), nl,
+    write('1) Adicionar Sessão'), nl,
+    write('2) Listar Sessões'), nl,
+    write('3) Editar Sessão'), nl,
+    write('4) Remover Sessão'), nl,
+    write('5) Voltar ao Menu Funcionário'), nl,
     read(Option),
-    handle_option(UserType, Option).
+    handle_session_option(Option).
 
-% Tratamento das opções do menu
-handle_option(UserType, '1') :-
-    add_session(UserType), manage_sessions(UserType).
-handle_option(UserType, '2') :-
-    edit_session(UserType), manage_sessions(UserType).
-handle_option(UserType, '3') :-
-    remove_session(UserType), manage_sessions(UserType).
-handle_option(UserType, '4') :-
-    view_sessions(UserType), manage_sessions(UserType).
-handle_option(_, '5') :-
-    write('Voltando ao menu principal...'), nl.
-handle_option(UserType, _) :-
-    write('Opção inválida. Tente novamente.'), nl,
-    manage_sessions(UserType).
+handle_session_option(1) :- 
+    write('Digite o ID da sessão: '), read(ID),
+    write('Digite o título do filme: '), read(Title),
+    write('Digite o horário da sessão (por exemplo, 15:00): '), read(Time),
+    write('Digite a sala (por exemplo, Sala 3): '), read(Room),
+    write('Digite a data de exibição do filme no formato DD/MM (por exemplo, 25/08): '), read(Date),
+    write('Digite o preço do ingresso (por exemplo, 20.50): '), read(Price),
+    write('Digite o tipo de áudio (Legendado ou Dublado): '), read(Audio),
+    add_session(ID, Title, Time, Room, Date, Price, Audio),
+    manage_sessions.
 
-% Função principal de inicialização
-session_management_main :-
-    load_sessions,
-    write('Informe o tipo de usuário (Employee ou Customer): '), read(UserType),
-    manage_sessions(UserType).
+handle_session_option(2) :- 
+    view_sessions,  % Certifique-se de que view_sessions/0 está implementado corretamente
+    manage_sessions.
+
+handle_session_option(3) :- 
+    write('Digite o ID da sessão a ser editada: '), read(EditID),
+    write('Digite o novo título do filme: '), read(NewTitle),
+    write('Digite o novo horário da sessão (por exemplo, 17:00): '), read(NewTime),
+    write('Digite a nova sala (por exemplo, Sala 4): '), read(NewRoom),
+    write('Digite a nova data de exibição do filme (por exemplo, 25/08): '), read(NewDate),
+    write('Digite o novo preço do ingresso (por exemplo, 25.00): '), read(NewPrice),
+    write('Digite o novo tipo de áudio (Legendado ou Dublado): '), read(NewAudio),
+    edit_session(EditID, NewTitle, NewTime, NewRoom, NewDate, NewPrice, NewAudio),
+    manage_sessions.
+
+handle_session_option(4) :- 
+    write('Digite o ID da sessão a ser removida: '), read(RemoveID),
+    remove_session(RemoveID),
+    manage_sessions.
+
+handle_session_option(5) :- 
+    write('Voltando ao Menu Funcionário...'), nl.

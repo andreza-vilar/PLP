@@ -48,7 +48,8 @@ edit_movie(EditID, NewTitle, NewDirector, NewYear, NewClassification, NewDuratio
         NewLine,
         (member(Line, Lines),
          (sub_string(Line, 0, _, _, EditID) ->
-             format(string(NewLine), "~s;~s;~s;~s;~s;~s", [EditID, NewTitle, NewDirector, NewYear, NewClassification, NewDuration])  % Atualiza a linha
+             format(string(NewLine), "~s;~s;~s;~s;~s;~s", 
+                    [EditID, NewTitle, NewDirector, NewYear, NewClassification, NewDuration])  % Atualiza a linha
          ;   NewLine = Line)),  % Mantém a linha original
         UpdatedLines
     ),
