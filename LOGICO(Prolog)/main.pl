@@ -1,85 +1,103 @@
-% Importa os modulos necessários
-:- consult('filmes.pl').  % Apenas o modulo de filmes por enquanto
-% Adicione os outros modulos conforme necessário
+% Importação dos mdulos necessários
+:- ensure_loaded('MovieManagement').
+:- ensure_loaded('SessionManagement').
+:- ensure_loaded('UserManagement').
+:- ensure_loaded('ConcessionStand').  
+:- ensure_loaded('ReviewManagement').  
+:- ensure_loaded('ClientInterface').   
+:- ensure_loaded('FAQ').              
 
-% Função principal para iniciar o sistema
-iniciar :- 
-    writeln('Bem-vindo ao Sistema de Gerenciamento do Cinema!'),
-    writeln('Você é cliente ou funcionário?'),
-    writeln('1. Funcionário'),
-    writeln('2. Cliente'),
-    writeln('3. Sair'),
-    read(Opcao),
-    processar_opcao(Opcao).
-
-% Processar a opção inicial do usuário
-processar_opcao(1) :- autenticar_funcionario.
-processar_opcao(2) :- menu_cliente.
-processar_opcao(3) :- 
-    writeln('Saindo do sistema. Até logo!').
-processar_opcao(_) :- 
-    writeln('Opção inválida. Tente novamente.'), 
-    iniciar.
-
-% Autenticação do funcionário
-autenticar_funcionario :-
-    writeln('Por favor, insira a senha de administrador:'),
-    read(Senha),
-    validar_senha(Senha).
+% Exibir a mensagem de boas-vindas
+show_welcome_message :-
+    write('████████╗ █████╗ ██████╗ ███████╗██████╗  ██████╗  █████╗ '), nl,
+    write('╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔══██╗'), nl,
+    write('   ██║   ███████║██████╔╝█████╗  ██████╔╝██║   ██║███████║'), nl,
+    write('   ██║   ██╔══██║██╔═══╝ ██╔══╝  ██╔══██╗██║   ██║██╔══██║'), nl,
+    write('   ██║   ██║  ██║██║     ███████╗██║  ██║╚██████╔╝██║  ██║'), nl,
+    write('   ╚═╝   ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝'), nl,
+    write('███████╗██╗██╗     ███╗   ███╗███████╗███████╗    ██╗     '), nl,
+    write('██╔════╝██║██║     ████╗ ████║██╔════╝██╔════╝    ██║     '), nl,
+    write('█████╗  ██║██║     ██╔████╔██║█████╗  ███████╗    ██║     '), nl,
+    write('██╔══╝  ██║██║     ██║╚██╔╝██║██╔══╝  ╚════██║    ╚═╝     '), nl,
+    write('██║     ██║███████╗██║ ╚═╝ ██║███████╗███████║    ██╗   '), nl.
 
 % Validação da senha do funcionário
-validar_senha(Senha) :-
-    Senha == 'admin',
-    writeln('Autenticação bem-sucedida!'),
-    menu_funcionario.
+validate_employee_password :-
+    write('Digite a senha de acesso para o modo Funcionário:'), nl,
+    read(Password),
+    ( Password = 'admin' ->
+        true
+    ;   write('Senha incorreta. Retornando ao menu principal.'), nl,
+        fail ).
 
-validar_senha(_) :-
-    writeln('Senha incorreta. Tente novamente.'),
-    iniciar.
+% Geração de relatórios de avaliação
+generate_reports :-
+    calculate_average_rating(InfraAvg, FoodAvg),
+    write('Relatório de Avaliações:'), nl,
+    write('Média das avaliações de infraestrutura: '), write(InfraAvg), nl,
+    write('Média das avaliações de comida: '), write(FoodAvg), nl.
 
-% Menu para funcionários com acesso privilegiado
-menu_funcionario :- 
-    writeln('Menu do Funcionário:'),
-    writeln('1. Gerenciar filmes'),
-    writeln('2. Gerenciar sessões'),
-    writeln('3. Gerenciar usuários'),
-    writeln('4. Gerar relatórios'),
-    writeln('5. Gerenciar bomboniere'),
-    writeln('6. Voltar ao menu principal'),
-    writeln('7. Sair'),  % Adiciona a opção de sair
-    read(OpcaoFuncionario),
-    processar_opcao_funcionario(OpcaoFuncionario).
+% Modo funcionário
+run_employee_mode :-
+    ( validate_employee_password ->
+        employee_menu
+    ;   main_menu
+    ).
 
-% Processamento das opções do funcionário
-processar_opcao_funcionario(1) :- gerenciar_filmes, menu_funcionario.
-processar_opcao_funcionario(2) :- menu_sessoes, menu_funcionario.
-processar_opcao_funcionario(3) :- menu_usuarios, menu_funcionario.
-processar_opcao_funcionario(4) :- gerar_relatorio_avaliacoes, menu_funcionario.
-processar_opcao_funcionario(5) :- menu_bomboniere, menu_funcionario.
-processar_opcao_funcionario(6) :- iniciar.  % Volta ao menu principal
-processar_opcao_funcionario(7) :- 
-    writeln('Voltando ao menu anterior...'), 
-    iniciar.  % Retorna ao menu anterior
-processar_opcao_funcionario(_) :- 
-    writeln('Opção inválida. Tente novamente.'),
-    menu_funcionario.
+% Menu do funcionário
+employee_menu :-
+    write('Modo Funcionário:'), nl,
+    write('1) Gerenciamento de Filmes'), nl,
+    write('2) Gerenciamento de Sessões'), nl,
+    write('3) Administração de Usuários'), nl,
+    write('4) Geração de Relatórios'), nl,
+    write('5) Gerenciamento da Bomboniere'), nl,
+    write('6) Voltar ao Menu Principal'), nl,
+    read(Option),
+    handle_employee_option(Option).
 
+handle_employee_option(1) :-
+    manage_movies,
+    employee_menu.
+handle_employee_option(2) :-
+    manage_sessions(employee),
+    employee_menu.
+handle_employee_option(3) :-
+    manage_users,
+    employee_menu.
+handle_employee_option(4) :-
+    generate_reports,
+    employee_menu.
+handle_employee_option(5) :-
+    manage_concession_stand,
+    employee_menu.
+handle_employee_option(6) :-
+    main_menu.
+handle_employee_option(_) :-
+    write('Opção inválida. Tente novamente.'), nl,
+    employee_menu.
 
-% Menu para clientes (exemplo, você pode expandir)
-menu_cliente :- 
-    writeln('Menu do Cliente:'),
-    writeln('1. Comprar ingresso'),
-    writeln('2. Avaliar sala/comida'),
-    writeln('3. Voltar ao menu principal'),
-    writeln('4. Sair'),
-    read(OpcaoCliente),
-    processar_opcao_cliente(OpcaoCliente).
+% Menu principal
+main_menu :-
+    write('Você é: 1) Funcionário 2) Cliente 3) Sair'), nl,
+    read(UserType),
+    handle_main_menu_option(UserType).
 
-processar_opcao_cliente(1) :- writeln('Comprar ingresso.').
-processar_opcao_cliente(2) :- writeln('Avaliar sala/comida.').
-processar_opcao_cliente(3) :- iniciar.
-processar_opcao_cliente(4) :- 
-    writeln('Saindo do sistema. Até logo!').
-processar_opcao_cliente(_) :- 
-    writeln('Opção inválida. Tente novamente.'),
-    menu_cliente.
+handle_main_menu_option(1) :-
+    run_employee_mode.
+handle_main_menu_option(2) :-
+    run_client_mode,
+    main_menu.
+handle_main_menu_option(3) :-
+    write('Encerrando o sistema.'), nl.
+handle_main_menu_option(_) :-
+    write('Opção inválida. Tente novamente.'), nl,
+    main_menu.
+
+% Função principal (inicial)
+main :-
+    show_welcome_message,
+    main_menu.
+
+% Alias para a função principal
+iniciar :- main.

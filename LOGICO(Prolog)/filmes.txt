@@ -1,1 +1,0 @@
-filme(1, 'teste', 'egeg', 24, 'rg', 234).
