@@ -9,7 +9,7 @@
 
 % Exibir a mensagem de boas-vindas
 show_welcome_message :-
-    write('TAPEROA FILMES!'), nl.
+    write(' TAPEROA FILMES! '), nl.
 
 % Validação da senha do funcionário
 validate_employee_password :-
