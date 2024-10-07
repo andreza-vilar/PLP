@@ -1,112 +1,108 @@
 :- use_module(library(readutil)).
+:- dynamic item/2, session/6.
 
 % Importando os modulos
 :- consult('SessionManagement').
 :- consult('CinemaInfo').
 :- consult('ReviewManagement').
-:- consult('FAQ').
+:- consult('faq').
 
 % Função para visualizar filmes
 view_movies :-
-    write("Lista de filmes disponiveis:"), nl,
-    read_file('movies.txt', Contents),
-    write(Contents), nl.
+    view_movies :-
+    open('movies.txt', read, Stream),
+    read_string(Stream, _, Contents),
+    writeln("Lista de filmes disponíveis:"),
+    writeln(Contents),
+    close(Stream).
 
 % Função para visualizar lançamentos futuros
 view_upcoming_movies :-
-    write("Lista de lancamentos futuros:"), nl,
-    read_file('upcoming_movies.txt', Contents),
-    write(Contents), nl.
+    open('upcoming_movies.txt', read, Stream),
+    read_string(Stream, _, Contents),
+    writeln("Lista de lançamentos futuros:"),
+    writeln(Contents),
+    close(Stream).
 
 % Função para visualizar itens da bomboniere
-view_items(Items) :-
-    read_file_lines('concessionStand.txt', Items),
-    write("Itens da bomboniere disponiveis:"), nl,
-    ( Items = [] ->
-        write("Nenhum item disponivel."), nl
-    ; maplist(write_item, Items)
-    ).
+view_items :-
+    findall((Nome, Preco), item(Nome, Preco), Itens),
+    (Itens == [] ->
+        writeln("Nenhum item disponível.");
+        writeln("Itens da bomboniere disponíveis:"),
+        print_items(Itens)).
 
-write_item(Item) :-
-    write(Item), nl.
+print_items([]).
+print_items([(Nome, Preco)|Rest]) :-
+    format("Item: ~w | Preço: R$ ~w~n", [Nome, Preco]),
+    print_items(Rest).
 
 % Função para comprar um item da bomboniere
 buy_item :-
-    view_items(Items),
-    ( Items = [] ->
-        write("Voltando ao menu principal..."), nl
-    ; write("Digite o nome do item que deseja comprar:"), nl,
-      read_line_to_string(user_input, ItemName),
-      ( member(ItemName, Items) ->
-          write("Voce comprou o item: "), write(ItemName), nl
-      ; write("Item nao encontrado. Voltando ao menu principal."), nl
-      )
-    ).
+    view_items,
+    writeln("Digite o nome do item que deseja comprar:"),
+    read(ItemName),
+    (item(ItemName, _) ->
+        format("Você comprou o item: ~w~n", [ItemName]);
+        writeln("Item não encontrado. Voltando ao menu principal.")).
 
 % Função para visualizar sessões de cinema
-view_sessions :-
-    write("Sessoes disponiveis:"), nl,
-    read_file('sessions.txt', Contents),
-    ( Contents = [] ->
-        write("Nenhuma sessao disponivel."), nl
-    ; read_term_from_atom(Contents, Sessions, []),
-      maplist(print_session_details, Sessions)
-    ).
+view_sessions_1 :-
+    findall((Titulo, Horario, Sala, Data, Preco, Audio), session(Titulo, Horario, Sala, Data, Preco, Audio), Sessoes),
+    (Sessoes == [] ->
+        writeln("Nenhuma sessão disponível.");
+        writeln("Sessões disponíveis:"),
+        print_sessions(Sessoes)).
 
 % Função auxiliar para imprimir os detalhes de uma sessão
-print_session_details(Session) :-
-    Session = session(Title, Time, Room, Date, Price, Audio),
-    write("Filme: "), write(Title), nl,
-    write("Data: "), write(Date), nl,
-    write("Horario: "), write(Time), nl,
-    write("Sala: "), write(Room), nl,
-    write("Preco do Ingresso: R$ "), write(Price), nl,
-    write("Tipo de audio: "), write(Audio), nl,
-    write("------------------------"), nl.
+print_sessions([]).
+print_sessions([(Titulo, Horario, Sala, Data, Preco, Audio) | Rest]) :-
+    format("Filme: ~w~n", [Titulo]),
+    format("Data: ~w~n", [Data]),
+    format("Horário: ~w~n", [Horario]),
+    format("Sala: ~w~n", [Sala]),
+    format("Preço do Ingresso: R$ ~w~n", [Preco]),
+    format("Tipo de Áudio: ~w~n", [Audio]),
+    writeln("------------------------"),
+    print_sessions(Rest).
 
 % Função para comprar um ingresso
 buy_ticket :-
-    write("Digite o titulo do filme para o qual deseja comprar o ingresso:"), nl,
-    read_line_to_string(user_input, MovieTitle),
-    write("Digite a data da sessao (DD/MM):"), nl,
-    read_line_to_string(user_input, SessionDate),
-    write("Digite o horario da sessao (HH:MM):"), nl,
-    read_line_to_string(user_input, SessionTime),
-    
-    read_file('sessions.txt', Contents),
-    read_term_from_atom(Contents, Sessions, []),
-    ( member(session(MovieTitle, SessionTime, _, SessionDate, Price, Audio), Sessions) ->
-        write("Sessao encontrada!"), nl,
-        write("Filme: "), write(MovieTitle), nl,
-        write("Data: "), write(SessionDate), nl,
-        write("Horario: "), write(SessionTime), nl,
-        write("Preco do Ingresso: R$ "), write(Price), nl,
-        write("Tipo de audio: "), write(Audio), nl,
-        write("Voce eh estudante e tem carteirinha? (s/n):"), nl,
-        read_line_to_string(user_input, IsStudent),
-        ( IsStudent = "s" ->
-            FinalPrice is Price * 0.5
-        ; FinalPrice is Price
-        ),
-        write("Preco final do Ingresso: R$ "), write(FinalPrice), nl,
-        write("Digite 's' para confirmar a compra ou qualquer outra tecla para cancelar:"), nl,
-        read_line_to_string(user_input, Confirmation),
-        ( Confirmation = "s" ->
-            write("Ingresso comprado com sucesso!"), nl
-        ; write("Compra cancelada."), nl
-        )
-    ; write("Sessao nao encontrada."), nl,
-      write("1) Tentar novamente"), nl,
-      write("2) Voltar ao menu anterior"), nl,
-      read_line_to_string(user_input, Option),
-      ( Option = "1" -> buy_ticket
-      ; true
-      )
-    ).
+    writeln("Digite o título do filme para o qual deseja comprar o ingresso:"),
+    read(MovieTitle),
+    writeln("Digite a data da sessão (DD/MM):"),
+    read(SessionDate),
+    writeln("Digite o horário da sessão (HH:MM):"),
+    read(SessionTime),
+    (session(MovieTitle, SessionTime, Sala, SessionDate, Preco, Audio) ->
+        format("Sessão encontrada!~n"),
+        format("Filme: ~w~n", [MovieTitle]),
+        format("Data: ~w~n", [SessionDate]),
+        format("Horário: ~w~n", [SessionTime]),
+        format("Sala: ~w~n", [Sala]),
+        format("Preço do Ingresso: R$ ~w~n", [Preco]),
+        format("Tipo de Áudio: ~w~n", [Audio]),
+        writeln("Você é estudante e tem carteirinha? (s/n):"),
+        read(IsStudent),
+        (IsStudent == "s" ->
+            FinalPrice is Preco * 0.5;
+            FinalPrice is Preco),
+        format("Preço final do Ingresso: R$ ~w~n", [FinalPrice]),
+        writeln("Digite 's' para confirmar a compra ou qualquer outra tecla para cancelar:"),
+        read(Confirmation),
+        (Confirmation == "s" ->
+            writeln("Ingresso comprado com sucesso!");
+            writeln("Compra cancelada."));
+        writeln("Sessão não encontrada.")).
 
 % Função para deixar feedback
 give_feedback :-
-    leave_review.
+    writeln("Digite seu feedback:"),
+    read_line_to_string(user_input, Feedback),
+    open('reviews.txt', append, Stream),
+    writeln(Stream, Feedback),
+    close(Stream),
+    writeln("Obrigado pelo seu feedback!").
 
 % Função auxiliar para ler o conteúdo de um arquivo
 read_file(File, Contents) :-
@@ -122,26 +118,26 @@ read_file_lines(File, Lines) :-
 
 % Menu do cliente
 run_client_mode :-
-    write("Modo Cliente:"), nl,
-    write("1) Visualizar Filmes"), nl,
-    write("2) Visualizar Sessoes Disponiveis"), nl,
-    write("3) Visualizar Lancamentos Futuros"), nl,
-    write("4) Comprar Ingresso"), nl,
-    write("5) Comprar Item da Bomboniere"), nl,
-    write("6) Visualizar Informacoes do Cinema"), nl,
-    write("7) Deixar Feedback"), nl,
-    write("8) Acessar FAQ"), nl,
-    write("9) Voltar ao Menu Principal"), nl,
+    writeln("Modo Cliente:"),
+    writeln("1) Visualizar Filmes"),
+    writeln("2) Visualizar Sessões Disponíveis"),
+    writeln("3) Visualizar Lançamentos Futuros"),
+    writeln("4) Comprar Ingresso"),
+    writeln("5) Comprar Item da Bomboniere"),
+    writeln("6) Visualizar Informações do Cinema"),
+    writeln("7) Deixar Feedback"),
+    writeln("8) Acessar FAQ"),
+    writeln("9) Voltar ao Menu Principal"),
+    read(Option),
+    handle_option(Option).
 
-    read_line_to_string(user_input, Option),
-    ( Option = "1" -> view_movies, run_client_mode
-    ; Option = "2" -> view_sessions, run_client_mode
-    ; Option = "3" -> view_upcoming_movies, run_client_mode
-    ; Option = "4" -> buy_ticket, run_client_mode
-    ; Option = "5" -> buy_item, run_client_mode
-    ; Option = "6" -> view_cinema_info, run_client_mode
-    ; Option = "7" -> give_feedback, run_client_mode
-    ; Option = "8" -> view_faq, run_client_mode
-    ; Option = "9" -> true
-    ; write("Opcao invalida. Tente novamente."), nl, run_client_mode
-    ).
+handle_option(1) :- view_movies, run_client_mode.
+handle_option(2) :- view_sessions_1, run_client_mode.
+handle_option(3) :- view_upcoming_movies, run_client_mode.
+handle_option(4) :- buy_ticket, run_client_mode.
+handle_option(5) :- buy_item, run_client_mode.
+handle_option(6) :- view_cinema_info, run_client_mode.
+handle_option(7) :- give_feedback, run_client_mode.
+handle_option(8) :- view_faq, run_client_mode.
+handle_option(9) :- writeln("Voltando ao menu principal.").
+handle_option(_) :- writeln("Opção inválida. Tente novamente."), run_client_mode.

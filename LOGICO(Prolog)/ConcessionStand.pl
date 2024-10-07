@@ -1,5 +1,6 @@
 :- use_module(library(readutil)).
 :- use_module(library(lists)).
+:- dynamic user/2.
 
 % Arquivo onde os itens da bomboniere são armazenados
 file_name('concessionStand.txt').
