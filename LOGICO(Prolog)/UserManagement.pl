@@ -2,6 +2,7 @@
 :- use_module(library(lists)).
 :- use_module(library(strings)).
 :- dynamic user/2.
+:- discontiguous print_users/1.
 
 % Função para adicionar um usuário
 add_user :-
@@ -17,7 +18,7 @@ add_user :-
 % Função para listar os usuários
 list_users(Users) :-
     open('usersCinema.txt', read, Stream),
-    read_lines(Stream, Users),
+    read_lines_1(Stream, Users),
     close(Stream),
     write('Lista de usuarios:\n'),
     print_users(Users).
@@ -28,13 +29,13 @@ print_users([(Email, Points)|T]) :-
     format("Usuario: ~w | Pontos: ~w", [Email, Points]), nl,
     print_users(T).
 
-read_lines(Stream, []) :-
+read_lines_1(Stream, []) :-
     at_end_of_stream(Stream).
 
-read_lines(Stream, [X|L]) :-
+read_lines_1(Stream, [X|L]) :-
     \+ at_end_of_stream(Stream),
     read_line_to_string(Stream, X),
-    read_lines(Stream, L).
+    read_lines_1(Stream, L).
 
 % Função para imprimir usuários
 print_users([]).
@@ -48,7 +49,7 @@ edit_user :-
     write('Digite o nome do usuario a ser editado: '),
     read(EmailToEdit),
     (   member(User, Users), sub_string(User, _, _, _, EmailToEdit)
-    ->  write('Digite o novo e-mail do usuario: '),
+    ->  write('Digite o novo nome do usuario: '),
         read(NewEmail),
         write('Digite a nova pontuacao do usuario: '),
         read(NewPoints),
