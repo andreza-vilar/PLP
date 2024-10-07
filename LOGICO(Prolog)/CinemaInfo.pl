@@ -1,5 +1,5 @@
 % Função para obter o endereço do cinema
-get_address("R. Irineu Joffily, 23-65 - Centro, Campina Grande. Cine Capitólio").
+get_address("R. Irineu Joffily, 23-65 - Centro, Campina Grande. Cine Capitolio").
 
 % Função para obter o contato do cinema
 get_contact("4002-8922").
@@ -12,8 +12,8 @@ view_cinema_info :-
     get_address(Address),
     get_contact(Contact),
     get_operating_hours(OperatingHours),
-    write("Informações do Cinema:"), nl,
-    write("Endereço: "), write(Address), nl,
+    write("Informacoes do Cinema:"), nl,
+    write("Endereco: "), write(Address), nl,
     write("Contato: "), write(Contact), nl,
-    write("Horário de Funcionamento: "), write(OperatingHours), nl.
+    write("Horario de Funcionamento: "), write(OperatingHours), nl.
 
