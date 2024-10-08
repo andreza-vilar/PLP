@@ -1,3 +1,6 @@
+:- discontiguous read_file/2.
+:- discontiguous read_file_1/2.
+
 % Arquivo onde os itens da bomboniere são armazenados
 file_name('concessionStand.txt').
 
@@ -34,14 +37,14 @@ display_item(Item) :-
     write(Item), nl.
 
 % Função auxiliar para imprimir os itens
-print_items([]).
-print_items([Item|Items]) :-
+print_itens([]).
+print_itens([Item|Items]) :-
     write(Item), nl,
-    print_items(Items).
+    print_itens(Items).
 
 
 % Função auxiliar para ler o conteúdo de um arquivo
-read_file(Stream, Contents) :-
+read_file_1(Stream, Contents) :-
     read_string(Stream, _, Contents).
 
 % Função para editar um item na bomboniere
@@ -53,7 +56,7 @@ edit_item :-
     read(NewName),
     write('Digite o novo preço do item (ou deixe em branco para manter o mesmo): \n'),
     read(NewPrice),
-    read_file('concessionStand.txt', Items),
+    read_file_1('concessionStand.txt', Items),
     update_items(OldName, NewName, NewPrice, Items, UpdatedItems),
     open('concessionStand.txt', write, Stream),
     write_file(Stream, UpdatedItems),
@@ -71,7 +74,7 @@ update_items(OldName, NewName, NewPrice, [Item|Items], UpdatedItems) :-
         update_items(OldName, NewName, NewPrice, Items, UpdatedItems1)
     ).
 
-% Função auxiliar para atualizar um item
+/*% Função auxiliar para atualizar um item
 update_item(Item, NewName, NewPrice, UpdatedItem) :-
     sub_string(Item, _, _, _, '|'),
     sub_string(Item, _, _, _, 'R$'),
@@ -82,7 +85,7 @@ update_item(Item, NewName, NewPrice, UpdatedItem) :-
     (   NewPrice \= ''
     ->  UpdatedItem = UpdatedItem ++ ' | R$ ' ++ NewPrice
     ;   UpdatedItem = UpdatedItem ++ ' | R$ ' ++ Item
-    ).
+    ).*/
 
 
 % Função para remover um item da bomboniere (somente funcionário)
@@ -95,7 +98,7 @@ remove_item :-
         read_lines(Stream, Items),
         close(Stream),
         write('Itens da bomboniere:'), nl,
-        print_items(Items),
+        print_itens(Items),
         write('Digite o nome do item a ser removido: \n'),
         read(ItemToRemove),
         remove_item_from_list(ItemToRemove, Items, UpdatedItems),
@@ -159,17 +162,10 @@ manage_concession_stand_option(_) :-
     manage_concession_stand.
 
 % Função auxiliar para ler um arquivo
-read_file(Stream, Items) :-
+read_file_1(Stream, Items) :-
     read_line(Stream, Line),
     (   Line = end_of_file
     ->  Items = []
     ;   Items = [Line|Items1],
-        read_file(Stream, Items1)
+        read_file_1(Stream, Items1)
     ).
-
-% Função auxiliar para escrever um arquivo
-write_file(Stream, []).
-write_file(Stream, [Item|Items]) :-
-    write(Stream, Item),
-    nl(Stream),
-    write_file(Stream, Items).
