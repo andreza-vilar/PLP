@@ -75,12 +75,12 @@ manage_sessions :-
     write('4) Visualizar Sessoes\n'),
     write('5) Voltar ao Menu Principal\n'),
     read(Option),
-    (   Option == 1 -> add_session(employee), manage_sessions(employee);
-        Option == 2 -> edit_session(employee), manage_sessions(employee);
-        Option == 3 -> remove_session(employee), manage_sessions(employee);
-        Option == 4 -> view_sessions, manage_sessions(employee);
+    (   Option == 1 -> add_session(employee), manage_sessions;
+        Option == 2 -> edit_session(employee), manage_sessions;
+        Option == 3 -> remove_session(employee), manage_sessions;
+        Option == 4 -> view_sessions, manage_sessions;
         Option == 5 -> write('Voltando ao menu principal...\n');
-        write('Opcao invalida. Tente novamente.\n'), manage_sessions(employee)
+        write('Opcao invalida. Tente novamente.\n'), manage_sessions
     ).
 
 % Carrega as sessões ao iniciar o programa

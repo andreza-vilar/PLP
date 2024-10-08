@@ -8,8 +8,7 @@
 :- consult('faq').
 
 % Função para visualizar filmes
-view_movies :-
-    view_movies :-
+view_movies_1 :-
     open('movies.txt', read, Stream),
     read_string(Stream, _, Contents),
     writeln("Lista de filmes disponíveis:"),
@@ -32,7 +31,7 @@ view_items :-
         writeln("Itens da bomboniere disponíveis:"),
         print_items(Itens)).
 
-print_items([]).
+print_items_([]).
 print_items([(Nome, Preco)|Rest]) :-
     format("Item: ~w | Preço: R$ ~w~n", [Nome, Preco]),
     print_items(Rest).
@@ -131,7 +130,7 @@ run_client_mode :-
     read(Option),
     handle_option(Option).
 
-handle_option(1) :- view_movies, run_client_mode.
+handle_option(1) :- view_movies_1, run_client_mode.
 handle_option(2) :- view_sessions_1, run_client_mode.
 handle_option(3) :- view_upcoming_movies, run_client_mode.
 handle_option(4) :- buy_ticket, run_client_mode.
